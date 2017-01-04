@@ -1,0 +1,310 @@
+<!--
+@license
+Copyright 2016 The Advanced REST client authors <arc@mulesoft.com>
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License. You may obtain a copy of
+the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../arc-icons/arc-icons.html">
+<link rel="import" href="../error-message/error-message.html">
+<link rel="import" href="../paper-tabs/paper-tabs.html">
+<link rel="import" href="../paper-tabs/paper-tab.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../response-raw-viewer/response-raw-viewer.html">
+<link rel="import" href="../xml-viewer/xml-viewer.html">
+<link rel="import" href="../json-viewer/json-viewer.html">
+<link rel="import" href="../response-highlighter/response-highlighter.html">
+<!--
+`<response-body-view>` An element to display the response body
+
+### Example
+```
+<response-body-view></response-body-view>
+```
+
+### Styling
+`<response-body-view>` provides the following custom properties and mixins for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--response-body-view` | Mixin applied to the element | `{}`
+
+@group UI Elements
+@element response-body-view
+@demo demo/index.html
+-->
+<dom-module id="response-body-view">
+  <template>
+    <style>
+    :host {
+      display: block;
+      position: relative;
+    }
+
+    #webView {
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      border: 0;
+    }
+    </style>
+    <div class="empty-info" hidden$="[[!isEmpty]]">
+      <error-message icon="arc:sentiment-neutral">
+        <p>The response was empty</p>
+      </error-message>
+    </div>
+    <div hidden$="[[isEmpty]]">
+      <paper-tabs selected="{{selectedTab}}" id="tabs" hidden$="[[contentPreview]]">
+        <paper-tab hidden$="[[!isRaw]]">Raw</paper-tab>
+        <paper-tab hidden$="[[!isParsed]]">Parsed</paper-tab>
+        <paper-tab hidden$="[[!isJson]]">JSON</paper-tab>
+        <paper-tab hidden$="[[!isXml]]">XML</paper-tab>
+      </paper-tabs>
+      <iron-pages selected="{{selectedTab}}" hidden$="[[contentPreview]]">
+        <response-raw-viewer response-text="[[_raw]]" hidden$="[[!isRaw]]">
+          <paper-icon-button title="Preview response" icon="visibility" toggles active="{{contentPreview}}"></paper-icon-button>
+        </response-raw-viewer>
+        <response-highlighter response-text="[[_raw]]" content-type="[[contentType]]" hidden$="[[!isParsed]]">
+          <paper-icon-button title="Preview response" icon="visibility" toggles active="{{contentPreview}}"></paper-icon-button>
+        </response-highlighter>
+        <section>
+        <template is="dom-if" if="[[isJson]]" restamp="true">
+          <json-viewer json="[[_raw]]">
+            <paper-icon-button title="Save content to file" icon="archive" on-tap="_saveFile"></paper-icon-button>
+          </json-viewer>
+        </template>
+        </section>
+        <section>
+        <template is="dom-if" if="[[isXml]]" restamp="true">
+          <xml-viewer xml="[[_raw]]">
+            <paper-icon-button title="Save content to file" icon="archive" on-tap="_saveFile"></paper-icon-button>
+          </xml-viewer>
+        </template>
+        </section>
+      </iron-pages>
+      <iframe id="webView" hidden$="[[!contentPreview]]"></iframe>
+    </div>
+  </template>
+  <script>
+  (function() {
+  'use strict';
+  var importLocation = '';
+  (function() {
+    if (window.currentImport && window.currentImport.URL) {
+      var url = window.currentImport.URL;
+      if (url === 'about:blank' && window.currentImport._URL) {
+        url = window.currentImport._URL;
+      }
+      if (url === 'about:blank') {
+        importLocation = '../';
+        // in test cases for edge this will fail because it should be set to ../../
+        // but right now I can't waste time to check how to check if this is the particular case.
+      } else {
+        var path = url.substr(url.indexOf('/', url.indexOf('/') + 2))
+          .replace('response-body-view.html', '');
+        var lastDot = path.lastIndexOf('.');
+        if (lastDot !== -1 && path.substr(lastDot + 1) === 'html') {
+          // remove element file name path
+          path = path.substr(0, path.lastIndexOf('/') + 1);
+        }
+        if (path.indexOf('/test') !== -1) {
+          path = path.substr(0, path.lastIndexOf('/') + 1);
+        }
+        importLocation = path;
+      }
+    }
+  })();
+  Polymer({
+    is: 'response-body-view',
+    properties: {
+      /**
+       * Raw response as a response text.
+       */
+      responseText: {
+        type: String,
+        observer: '_responseTextChanged'
+      },
+      // A variable to be set after the `responseText` change
+      _raw: {
+        type: String
+      },
+      /**
+       * The response content type.
+       */
+      contentType: {
+        type: String,
+        observer: '_contentTypeChanged'
+      },
+      /**
+       * If true then the conent preview will be visible instead of the code view
+       */
+      contentPreview: {
+        type: Boolean,
+        value: false,
+        observer: '_contentPreviewChanged'
+      },
+      /**
+       * True if "raw" tab is visible.
+       */
+      isRaw: {
+        type: Boolean,
+        value: true,
+        readOnly: true,
+        observer: '_tabsChanged'
+      },
+      /**
+       * True if "parsed" tab is visible.
+       */
+      isParsed: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        observer: '_tabsChanged'
+      },
+      /**
+       * True if "json" tab is svisible.
+       */
+      isJson: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        observer: '_tabsChanged'
+      },
+      /**
+       * True if "xml" tab is visible.
+       */
+      isXml: {
+        type: Boolean,
+        value: false,
+        readOnly: true,
+        observer: '_tabsChanged'
+      },
+      // Computed value, true if the response is empty.
+      isEmpty: {
+        type: Boolean,
+        value: true,
+        readOnly: true
+      },
+      /**
+       * Selected view.
+       */
+      selectedTab: {
+        type: Number,
+        value: 0
+      }
+    },
+
+    attached: function() {
+      // A listener from the preview iframe
+      this.listen(window, 'message', '_onExternalMessage');
+      this.$.webView.src = importLocation + 'html-preview.html';
+    },
+
+    detached: function() {
+      this.unlisten(window, 'message', '_onExternalMessage');
+    },
+
+    _tabsChanged: function() {
+      this.$.tabs.notifyResize();
+    },
+
+    _resetTabs: function() {
+      this._setIsParsed(false);
+      this._setIsJson(false);
+      this._setIsXml(false);
+      this._setIsEmpty(false);
+      this.contentPreview = false;
+    },
+
+    _responseTextChanged: function(payload) {
+      if (payload === undefined) {
+        return this.set('_raw', undefined);
+      }
+      if (payload === null || payload === false) {
+        return this.set('_raw', payload);
+      }
+      if (!payload) {
+        return this._setIsEmpty(true);
+      }
+      this.set('_raw', undefined);
+      this.debounce('set-raw', function() {
+        this.set('_raw', this.responseText);
+      }, 10);
+    },
+
+    _contentTypeChanged: function(contentType) {
+      this._resetTabs();
+      if (!contentType) {
+        return;
+      }
+      if (contentType.indexOf('xml') !== -1) {
+        this.selectedTab = 3;
+        this._setIsXml(true);
+      } else if (contentType.indexOf('json') !== -1) {
+        this.selectedTab = 2;
+        this._setIsJson(true);
+      } else {
+        this.selectedTab = 1;
+        this._setIsParsed(true);
+      }
+    },
+
+    // Handler for `this.contentPreview` change.
+    _contentPreviewChanged: function(val) {
+      if (!this.isAttached) {
+        return;
+      }
+      if (val) {
+        this._openResponsePreview();
+      } else {
+        this._closeResponsePreview();
+      }
+    },
+    // Opens response preview in new layer
+    _openResponsePreview: function() {
+      if (!this.isAttached) {
+        return;
+      }
+      this.$.webView.contentWindow.postMessage({
+        'rawResponse': this._raw
+      }, '*');
+    },
+    // Closes response preview
+    _closeResponsePreview: function() {
+      if (!this.isAttached) {
+        return;
+      }
+      this.$.webView.contentWindow.postMessage({
+        'cleanUp': true
+      }, '*');
+    },
+    // a message received from the external page using window.postMessage.
+    _onExternalMessage: function(e) {
+      if (!this.isAttached) {
+        return;
+      }
+      if (!e || !e.data) {
+        return;
+      }
+      if ('preview-window-height' in e.data) {
+        var height = e.data['preview-window-height'];
+        if (!height) {
+          this.$.webView.style.height = 'auto';
+        } else {
+          this.$.webView.style.height = e.data['preview-window-height'] + 'px';
+        }
+      } else if (e.data['preview-window-close']) {
+        this.contentPreview = false;
+      }
+    }
+  });
+  })();
+  </script>
+</dom-module>
