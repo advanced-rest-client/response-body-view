@@ -18,7 +18,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script src="../../iron-test-helpers/test-helpers.js"></script>
     <script src="../../iron-test-helpers/mock-interactions.js"></script>
 
-    <!-- Step 1: import the element to test -->
     <link rel="import" href="../response-body-view.html">
   </head>
   <body>
@@ -30,13 +29,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global fixture, assert, MockInteractions, sinon */
+    /* global fixture, assert, MockInteractions, sinon, TestHelpers */
     suite('basic', function() {
       var element;
 
       setup(function() {
         element = fixture('basic');
       });
+
+      function isNotSafari() {
+        return !/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      }
 
       test('Should set isParsed property', function(done) {
         element.contentType = 'text/plain';
@@ -68,7 +71,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }, 2);
       });
 
-      test('Should set file content URL', function(done) {
+      test('Should set file content URL', TestHelpers.skipUnless(isNotSafari, function(done) {
         element.contentType = 'application/xml';
         element.responseText = '<test></test>';
         setTimeout(function() {
@@ -78,7 +81,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           assert.isString(element.downloadFileName);
           done();
         }, 2);
-      });
+      }));
 
       test('Should fire save-content-to-file event', function(done) {
         element.contentType = 'application/xml';
