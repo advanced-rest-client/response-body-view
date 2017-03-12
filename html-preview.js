@@ -1,6 +1,6 @@
 var notifyResize = function() {
   window.top.postMessage({
-    'preview-window-height': document.body.clientHeight + 40
+    'preview-window-height': document.body.clientHeight
   }, '*');
 };
 
@@ -20,8 +20,7 @@ var messageHandler = function(event) {
 window.addEventListener('message', messageHandler);
 window.addEventListener('resize', notifyResize);
 
-var link = document.querySelector('#closeButton');
-link.addEventListener('click', function() {
+document.querySelector('#closeButton').addEventListener('click', function() {
   window.top.postMessage({
     'preview-window-close': true
   }, '*');

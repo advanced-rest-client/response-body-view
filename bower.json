@@ -1,7 +1,7 @@
 {
   "name": "response-body-view",
   "description": "An element to display the response body",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "license": "Apache-2.0 OR CC-BY-4.0",
   "authors": [
     "The Advanced REST client authors <arc@mulesoft.com>"
@@ -31,7 +31,9 @@
     "json-viewer": "advanced-rest-client/json-viewer#^0.1.1",
     "error-message": "advanced-rest-client/error-message#^0.1.1",
     "arc-icons": "advanced-rest-client/arc-icons#^1.0.12",
-    "response-highlighter": "advanced-rest-client/response-highlighter#^0.1.1"
+    "response-highlighter": "advanced-rest-client/response-highlighter#^0.1.1",
+    "clipboard-copy": "advanced-rest-client/clipboard-copy#^0.1.1",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.1.0"
   },
   "devDependencies": {
     "iron-component-page": "polymerelements/iron-component-page#1.0.0",
