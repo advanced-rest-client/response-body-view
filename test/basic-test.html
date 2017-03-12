@@ -18,7 +18,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script src="../../iron-test-helpers/test-helpers.js"></script>
     <script src="../../iron-test-helpers/mock-interactions.js"></script>
 
-    <!-- Step 1: import the element to test -->
     <link rel="import" href="../response-body-view.html">
   </head>
   <body>
@@ -30,14 +29,91 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global suite, test, fixture, assert */
+    /* global fixture, assert, MockInteractions, sinon, TestHelpers */
     suite('basic', function() {
       var element;
+
       setup(function() {
         element = fixture('basic');
       });
-      test('`response-body-view` should be initialized', function() {
-        assert.equal(element.isAttached, true, 'element.isAttached equals true');
+
+      function isNotSafari() {
+        return !/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      }
+
+      test('Should set isParsed property', function(done) {
+        element.contentType = 'text/plain';
+        element.responseText = 'Test';
+        setTimeout(function() {
+          assert.isTrue(element.isParsed, 'isParsed equals true');
+          assert.equal(element.activeView, 1, 'activeView equals 1');
+          done();
+        }, 2);
+      });
+
+      test('Should set isJson property', function(done) {
+        element.contentType = 'application/json';
+        element.responseText = '{}';
+        setTimeout(function() {
+          assert.isTrue(element.isJson, 'isJson equals true');
+          assert.equal(element.activeView, 2, 'activeView equals 2');
+          done();
+        }, 2);
+      });
+
+      test('Should set xml view', function(done) {
+        element.contentType = 'application/xml';
+        element.responseText = '<test></test>';
+        setTimeout(function() {
+          assert.isTrue(element.isXml, 'isXml equals true');
+          assert.equal(element.activeView, 3, 'activeView equals 3');
+          done();
+        }, 2);
+      });
+
+      test('Should set file content URL', TestHelpers.skipUnless(isNotSafari, function(done) {
+        element.contentType = 'application/xml';
+        element.responseText = '<test></test>';
+        setTimeout(function() {
+          var button = Polymer.dom(element.root).querySelector('paper-icon-button[icon="arc:archive"]');
+          MockInteractions.tap(button);
+          assert.isString(element.downloadFileUrl);
+          assert.isString(element.downloadFileName);
+          done();
+        }, 2);
+      }));
+
+      test('Should fire save-content-to-file event', function(done) {
+        element.contentType = 'application/xml';
+        element.responseText = '<test></test>';
+        setTimeout(function() {
+          var spy = sinon.stub();
+          element.addEventListener('save-content-to-file', spy);
+          var button = Polymer.dom(element.root).querySelector('paper-icon-button[icon="arc:archive"]');
+          MockInteractions.tap(button);
+          assert.isTrue(spy.calledOnce, 'save-content-to-file was not fired');
+          done();
+        }, 2);
+      });
+
+      test('Canceled save-content-to-file event will not display dialog', function(done) {
+        element.contentType = 'application/xml';
+        element.responseText = '<test></test>';
+        var clb = function(e) {
+          e.preventDefault();
+          element.removeEventListener('save-content-to-file', clb);
+          // Next event loop so the event will finish.
+          setTimeout(function() {
+            var dialog = Polymer.dom(element.root).querySelector('#saveDialog');
+            assert.isFalse(dialog.opened);
+            done();
+          }, 1);
+        };
+        setTimeout(function() {
+          element.addEventListener('save-content-to-file', clb);
+          var button = Polymer.dom(element.root).querySelector('paper-icon-button[icon="arc:archive"]');
+          MockInteractions.tap(button);
+        }, 2);
       });
     });
     </script>

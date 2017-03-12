@@ -25,6 +25,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="../../paper-button/paper-button.html">
   <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
   <link rel="import" href="../../paper-toast/paper-toast.html">
+  <link rel="import" href="../../fetch-polyfill/fetch-polyfill.html">
 
   <link rel="import" href="../response-body-view.html">
 
@@ -59,7 +60,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </div>
   <script>
     var scope = document.querySelector('template[is="dom-bind"]');
-    scope.url = 'https://cdn.rawgit.com/jarrodek/ChromeRestClient/develop/tasks/test-data/xml1.xml';
+    // scope.url = 'https://cdn.rawgit.com/jarrodek/ChromeRestClient/develop/tasks/test-data/xml1.xml';
+    scope.url = 'https://cdn.rawgit.com/raml-org/raml-examples/367423e7/schemas/person.json';
     scope.response = '';
     scope.contentType = '';
     scope.download = function() {
@@ -85,9 +87,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     scope._additionalAction = function() {
       document.querySelector('paper-toast').opened = true;
     };
-    if (!('fetch' in window)) {
-      window.alert('Your browser doesn\'t support Fetch API required by this demo. Though, the element may work just fine.');
-    }
   </script>
 </body>
 </html>

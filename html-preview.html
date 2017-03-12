@@ -17,10 +17,16 @@
   }
 
   .actions {
-    margin-bottom: 20px;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    background-color: #fff;
   }
 
-  #closeButton {
+  .button {
     display: inline-block;
     text-decoration: none;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
@@ -34,12 +40,16 @@
     padding: 0.7em 0.57em;
     color: rgba(0, 0, 0, 0.74);
   }
+
+  #preview {
+    margin-top: 60px;
+  }
   </style>
 </head>
 
 <body>
   <div class="actions">
-    <a id="closeButton" href="#">CLOSE PREVIEW</a>
+    <a class="button" id="closeButton" href="#">CLOSE PREVIEW</a>
   </div>
   <div id="preview"></div>
   <script src="html-preview.js"></script>
