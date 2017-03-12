@@ -21,6 +21,7 @@ the License.
 <link rel="import" href="../clipboard-copy/clipboard-copy.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
 
 <!--
 `<response-body-view>` An element to display a HTTP response body.
@@ -135,7 +136,7 @@ Custom property | Description | Default
       <div>
         <p>Your file is ready to download. Click the icon below to save it to your local drive.</p>
         <div class="donnload-section">
-          <a href$="[[downloadFileUrl]]" download$="[[downloadFileName]]" on-tap="_downloadIconTap">
+          <a href$="[[downloadFileUrl]]" download$="[[downloadFileName]]" on-tap="_downloadIconTap" target="_blank">
             <paper-icon-button icon="arc:file-download" class="download-file-icon" title="Download file"></paper-icon-button>
           </a>
         </div>
@@ -145,10 +146,13 @@ Custom property | Description | Default
       </div>
     </paper-dialog>
     <clipboard-copy content="[[_raw]]"></clipboard-copy>
+    <paper-toast id="safariDownload" text="Safari doesn't support file download. Please, use other browser."></paper-toast>
   </template>
   <script>
   (function() {
     'use strict';
+    /* global webkitURL */
+    window.URL = URL || webkitURL;
     var importLocation = '';
     (function() {
       var url;
@@ -272,6 +276,14 @@ Custom property | Description | Default
           value: function() {
             return importLocation;
           }
+        },
+        // Computed value. True is current browser is Safari - the new IE.
+        isSafari: {
+          type: Boolean,
+          value: function() {
+            return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+          },
+          readOnly: true
         }
       },
 
@@ -417,7 +429,11 @@ Custom property | Description | Default
         if (e.defaultPrevented) {
           return;
         }
-        this.saveToFile();
+        if (this.isSafari) {
+          this.$.safariDownload.opened = true;
+        } else {
+          this.saveToFile();
+        }
       },
 
       /**
