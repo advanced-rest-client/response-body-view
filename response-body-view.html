@@ -261,7 +261,18 @@ Custom property | Description | Default
           readOnly: true
         },
         // Is true then the text in "raw" preview will be wrapped.
-        rawTextWrap: Boolean
+        rawTextWrap: Boolean,
+        /**
+         * Location of this script computed during element's initialization.
+         * It points to the assets depended assests location (in this case
+         * the `html-preview.html` file).
+         */
+        importLocation: {
+          type: String,
+          value: function() {
+            return importLocation;
+          }
+        }
       },
 
       observers: [
@@ -271,7 +282,7 @@ Custom property | Description | Default
       attached: function() {
         // A listener from the preview iframe
         this.listen(window, 'message', '_onExternalMessage');
-        this.$.webView.src = importLocation + 'html-preview.html';
+        this.$.webView.src = this.importLocation + 'html-preview.html';
       },
 
       detached: function() {
