@@ -1,3 +1,14 @@
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/advanced-rest-client/response-body-view/compare/0.1.1...v0.1.3) (2017-04-04)
+
+
+### Update
+
+* Added a JSON table view for the JSON viewer ([3954755d2c801ab30920f8ddcb8a6e7bb6da97e7](https://github.com/advanced-rest-client/response-body-view/commit/3954755d2c801ab30920f8ddcb8a6e7bb6da97e7))
+* Replaced order of changing the view and rendering the table view for performance reasons ([0c357597900e54815ee9a7ff5c8deceb137d611b](https://github.com/advanced-rest-client/response-body-view/commit/0c357597900e54815ee9a7ff5c8deceb137d611b))
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/advanced-rest-client/response-body-view/compare/0.1.1...v0.1.2) (2017-04-04)
 
