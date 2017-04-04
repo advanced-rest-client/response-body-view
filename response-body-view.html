@@ -22,6 +22,7 @@ the License.
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../json-table/json-table.html">
 
 <!--
 `<response-body-view>` An element to display a HTTP response body.
@@ -117,6 +118,7 @@ Custom property | Description | Default
             <paper-icon-button content-action title="Copy content to clipboard" icon="arc:content-copy" on-tap="_copyToClipboard"></paper-icon-button>
             <paper-icon-button content-action title="Save content to file" icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
             <paper-icon-button content-action title="View raw response (without syntax highlighting)" icon="arc:code" on-tap="toggleViewSource"></paper-icon-button>
+            <paper-icon-button content-action title="View in a structured table" icon="arc:view-column" on-tap="toggleViewJsonTabble"></paper-icon-button>
           </json-viewer>
         </template>
       </section>
@@ -127,6 +129,16 @@ Custom property | Description | Default
             <paper-icon-button content-action title="Save content to file" icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
             <paper-icon-button content-action title="View raw response (without syntax highlighting)" icon="arc:code" on-tap="toggleViewSource"></paper-icon-button>
           </xml-viewer>
+        </template>
+      </section>
+      <section>
+        <template is="dom-if" if="[[isJsonTable]]">
+          <json-table json="[[_raw]]">
+            <paper-icon-button content-action title="Copy content to clipboard" icon="arc:content-copy" on-tap="_copyToClipboard"></paper-icon-button>
+            <paper-icon-button content-action title="Save content to file" icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
+            <paper-icon-button content-action title="View raw response (without syntax highlighting)" icon="arc:code" on-tap="toggleViewSource"></paper-icon-button>
+            <paper-icon-button content-action title="View in a structured table" icon="arc:view-column" on-tap="toggleViewJsonTabble" toggles active></paper-icon-button>
+          </json-table>
         </template>
       </section>
     </iron-pages>
@@ -283,6 +295,13 @@ Custom property | Description | Default
           value: function() {
             return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
           },
+          readOnly: true
+        },
+        /**
+         * If true then the JSON table view is active for the JSON viewer
+         */
+        isJsonTable: {
+          type: Boolean,
           readOnly: true
         }
       },
@@ -477,9 +496,22 @@ Custom property | Description | Default
         if (this.__parsedView) {
           this.activeView = this.__parsedView;
           this.__parsedView = undefined;
+          if (this.activeView === 2 && this.isJsonTable) {
+            this._setIsJsonTable(false);
+          }
         } else {
           this.__parsedView = this.activeView;
           this.activeView = 0;
+        }
+      },
+
+      toggleViewJsonTabble: function() {
+        if (this.isJsonTable) {
+          this.activeView = 2;
+          this._setIsJsonTable(false);
+        } else {
+          this.activeView = 4;
+          this._setIsJsonTable(true);
         }
       }
     });
