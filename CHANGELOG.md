@@ -1,3 +1,13 @@
+<a name="0.1.6"></a>
+## [0.1.6](https://github.com/advanced-rest-client/response-body-view/compare/0.1.4...v0.1.6) (2017-04-12)
+
+
+### Update
+
+* Added support for sticky JSON table view ([73edbd8f765b20da99559cdef8ba05f094aff5a1](https://github.com/advanced-rest-client/response-body-view/commit/73edbd8f765b20da99559cdef8ba05f094aff5a1))
+
+
+
 <a name="0.1.5"></a>
 ## [0.1.5](https://github.com/advanced-rest-client/response-body-view/compare/0.1.4...v0.1.5) (2017-04-12)
 
