@@ -206,6 +206,13 @@ Custom property | Description | Default
        * @event save-content-to-file
        * @param {String} content A text to save in file.
        */
+      /**
+       * Fired when the `isJsonTable` property change to inform other elements to switch
+       * corresponding view as well.
+       *
+       * @event json-table-state-changed
+       * @param {Boolean} enabled If true then the view is enabled.
+       */
       properties: {
         /**
          * Raw response as a response text.
@@ -302,7 +309,8 @@ Custom property | Description | Default
          */
         isJsonTable: {
           type: Boolean,
-          readOnly: true
+          readOnly: true,
+          observer: '_jsonTableChanged'
         }
       },
 
@@ -313,11 +321,15 @@ Custom property | Description | Default
       attached: function() {
         // A listener from the preview iframe
         this.listen(window, 'message', '_onExternalMessage');
+        this.listen(window, 'storage', '_onStorageChanged');
+        this.listen(window, 'json-table-state-changed', '_onJsonTableStateChanged');
         this.$.webView.src = this.importLocation + 'html-preview.html';
       },
 
       detached: function() {
         this.unlisten(window, 'message', '_onExternalMessage');
+        this.unlisten(window, 'storage', '_onStorageChanged');
+        this.unlisten(window, 'json-table-state-changed', '_onJsonTableStateChanged');
       },
       // The operation is async for performance reasons.
       _responseTextChanged: function(payload) {
@@ -364,6 +376,16 @@ Custom property | Description | Default
         this._setIsXml(xml);
         this._setIsJson(json);
         this._setIsParsed(parsed);
+
+        if (json) {
+          var isTable = this._localStorageValueToBoolean(localStorage.jsonTableEnabled);
+          if (this.isJsonTable !== isTable) {
+            this._setIsJsonTable(isTable);
+          }
+          if (this.isJsonTable) {
+            this.activeView = 4;
+          }
+        }
       },
 
       // Handler for `this.contentPreview` change.
@@ -512,6 +534,61 @@ Custom property | Description | Default
         } else {
           this.activeView = 4;
           this._setIsJsonTable(true);
+        }
+      },
+      // Handler to the isJsonTable change, fires corresponding event and sets local storage.
+      _jsonTableChanged: function(state) {
+        if (state === undefined) {
+          return;
+        }
+        if (localStorage.jsonTableEnabled !== String(state)) {
+          window.localStorage.setItem('jsonTableEnabled', state);
+        }
+        this.fire('json-table-state-changed', {
+          enabled: state
+        });
+      },
+      /**
+       * Updates the value of the `isJsonTable` property when the corresponding localStorage
+       * property change.
+       */
+      _onStorageChanged: function(e) {
+        if (e.key !== 'jsonTableEnabled') {
+          return;
+        }
+        if (!e.newValue) {
+          return;
+        }
+        var v = this._localStorageValueToBoolean(e.newValue);
+        if (this.isJsonTable !== v) {
+          this._setIsJsonTable(v);
+        }
+      },
+      /**
+       * Reads the local value (always a string) as a boolean value.
+       *
+       * @param {String} value The value read from the local storage.
+       * @return {Boolean} Boolean value read from the value.
+       */
+      _localStorageValueToBoolean: function(value) {
+        if (!value) {
+          return false;
+        }
+        if (value === 'true') {
+          value = true;
+        } else {
+          value = false;
+        }
+        return value;
+      },
+
+      _onJsonTableStateChanged: function(e) {
+        if (e.target === this) {
+          return;
+        }
+        var enabled = e.detail.enabled;
+        if (enabled !== this.isJsonTable) {
+          this._setIsJsonTable(enabled);
         }
       }
     });

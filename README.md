@@ -35,4 +35,5 @@ Custom property | Description | Default
 ### Events
 | Name | Description | Params |
 | --- | --- | --- |
+| json-table-state-changed | Fired when the `isJsonTable` property change to inform other elements to switch corresponding view as well. | enabled **Boolean** - If true then the view is enabled. |
 | save-content-to-file | Fired when the user click on save to file button.  Application can handle this event if it has a way to natively implement save to file functionality. In this case this event must be canceled by calling `preventDefault()` on it. If the event is not canceled then save to file dialog will appear with regular download link. | content **String** - A text to save in file. |
