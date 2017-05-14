@@ -1,3 +1,13 @@
+<a name="0.1.8"></a>
+## [0.1.8](https://github.com/advanced-rest-client/response-body-view/compare/0.1.7...v0.1.8) (2017-05-14)
+
+
+### Update
+
+* Replaced external HTML preview files with internall content generated at runtime usinf URL object ([57d6b8f153209f404396b9ac1c6a757f403be228](https://github.com/advanced-rest-client/response-body-view/commit/57d6b8f153209f404396b9ac1c6a757f403be228))
+
+
+
 <a name="0.1.7"></a>
 ## [0.1.7](https://github.com/advanced-rest-client/response-body-view/compare/0.1.6...v0.1.7) (2017-04-12)
 
