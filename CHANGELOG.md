@@ -1,3 +1,13 @@
+<a name="0.1.9"></a>
+## [0.1.9](https://github.com/advanced-rest-client/response-body-view/compare/0.1.8...0.1.9) (2017-08-31)
+
+
+### New
+
+* Added handler for the `prism-highlight-timeout` event. ([9e53920a768475b0010d5c1fca158a9c9b07a9ab](https://github.com/advanced-rest-client/response-body-view/commit/9e53920a768475b0010d5c1fca158a9c9b07a9ab))
+
+
+
 <a name="0.1.8"></a>
 ## [0.1.8](https://github.com/advanced-rest-client/response-body-view/compare/0.1.7...v0.1.8) (2017-05-14)
 
