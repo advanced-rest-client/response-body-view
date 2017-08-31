@@ -171,6 +171,7 @@ Custom property | Description | Default
 
     <clipboard-copy content="[[_raw]]"></clipboard-copy>
     <paper-toast id="safariDownload" text="Safari doesn't support file download. Please, use other browser."></paper-toast>
+    <paper-toast id="highlightTimeout"></paper-toast>
 
     <script id="preview" type="text/html">
       <!DOCTYPE html><html><head><title>Advanced REST client - preview</title><style>
@@ -297,6 +298,10 @@ Custom property | Description | Default
       observers: [
         '_contentTypeChanged(contentType, _raw)'
       ],
+
+      listeners: {
+        'prism-highlight-timeout': '_onPrismHighlightTimeout'
+      },
 
       attached: function() {
         this.listen(window, 'storage', '_onStorageChanged');
@@ -578,6 +583,16 @@ Custom property | Description | Default
 
       closePreview: function() {
         this.contentPreview = false;
+      },
+      /**
+       * Handler for the `prism-highlight-timeout` event. Displays "raw" view
+       * instead of syntax highlighting.
+       */
+      _onPrismHighlightTimeout: function(e) {
+        this.__parsedView = this.activeView;
+        this.activeView = 0;
+        this.$.highlightTimeout.text = e.detail.message;
+        this.$.highlightTimeout.opened = true;
       }
     });
   })();
