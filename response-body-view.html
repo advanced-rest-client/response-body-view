@@ -292,6 +292,23 @@ Custom property | Description | Default
           type: Boolean,
           readOnly: true,
           observer: '_jsonTableChanged'
+        },
+        /**
+         * Computed value, true if current environment support localStorage API.
+         * Chrome API doesn't support this API.
+         */
+        hasLocalStorage: {
+          type: Boolean,
+          readOnly: true,
+          value: function() {
+            try {
+              localStorage.__test__ = true;
+              delete localStorage.__test__;
+              return true;
+            } catch (e) {
+              return false;
+            }
+          }
         }
       },
 
@@ -363,7 +380,7 @@ Custom property | Description | Default
         this._setIsJson(json);
         this._setIsParsed(parsed);
 
-        if (json) {
+        if (json && this.hasLocalStorage) {
           var isTable = this._localStorageValueToBoolean(localStorage.jsonTableEnabled);
           if (this.isJsonTable !== isTable) {
             this._setIsJsonTable(isTable);
@@ -530,7 +547,7 @@ Custom property | Description | Default
         if (state === undefined) {
           return;
         }
-        if (localStorage.jsonTableEnabled !== String(state)) {
+        if (this.hasLocalStorage && localStorage.jsonTableEnabled !== String(state)) {
           window.localStorage.setItem('jsonTableEnabled', state);
         }
         this.fire('json-table-state-changed', {
