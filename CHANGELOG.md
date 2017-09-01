@@ -1,3 +1,13 @@
+<a name="0.1.11"></a>
+## [0.1.11](https://github.com/advanced-rest-client/response-body-view/compare/0.1.10...0.1.11) (2017-09-01)
+
+
+### New
+
+* Added API availability check for local storage. ([bb40dc1df27070c210edc7d2e7a6b7dbbfbad0a7](https://github.com/advanced-rest-client/response-body-view/commit/bb40dc1df27070c210edc7d2e7a6b7dbbfbad0a7))
+
+
+
 <a name="0.1.10"></a>
 ## [0.1.10](https://github.com/advanced-rest-client/response-body-view/compare/0.1.9...0.1.10) (2017-08-31)
 
