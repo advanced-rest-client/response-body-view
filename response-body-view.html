@@ -80,6 +80,7 @@ Custom property | Description | Default
     .donnload-section {
       @apply(--layout-vertical);
       @apply(--layout-center);
+      @apply(--response-view-download-section);
     }
 
     .download-file-icon {
@@ -98,7 +99,27 @@ Custom property | Description | Default
       right: 12px;
       background: #fff;
       color: rgba(0,0,0,0.74);
-      @apply(--response-body-preview-close);
+    }
+    .dialog-title {
+      @apply(--paper-font-common-base);
+      @apply(--response-view-download-title);
+    }
+    .button-dismiss {
+      @apply(--response-view-download-btn-close);
+    }
+    .button-download {
+      display: none;
+      @apply(--response-view-download-btn-download);
+    }
+    .button-download:hover {
+      display: none;
+      @apply(--response-view-download-btn-download-hover);
+    }
+    .button-dismiss:hover {
+      @apply(--response-view-download-btn-close-hover);
+    }
+    .buttons {
+      @apply(--response-view-download-btn-close-container);
     }
     </style>
     <iron-pages selected="{{activeView}}" hidden$="[[contentPreview]]">
@@ -156,7 +177,7 @@ Custom property | Description | Default
     <paper-icon-button class="close-preview" title="Close the preview" icon="arc:close" on-tap="closePreview" hidden$="[[!contentPreview]]"></paper-icon-button>
 
     <paper-dialog id="saveDialog" on-iron-overlay-closed="_downloadDialogClose">
-      <h2>Save to file</h2>
+      <h2 class="dialog-title">Save to file</h2>
       <div>
         <p>Your file is ready to download. Click the icon below to save it to your local drive.</p>
         <div class="donnload-section">
@@ -166,7 +187,10 @@ Custom property | Description | Default
         </div>
       </div>
       <div class="buttons">
-        <paper-button dialog-dismiss autofocus>Close</paper-button>
+        <paper-button class="button-dismiss" dialog-dismiss autofocus>Close</paper-button>
+        <a href$="[[downloadFileUrl]]" download$="[[downloadFileName]]" on-tap="_downloadIconTap" target="_blank">
+          <paper-button class="button-download">Download file</paper-icon>
+        </a>
       </div>
     </paper-dialog>
 
