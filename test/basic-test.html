@@ -30,16 +30,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script>
     /* global fixture, assert, MockInteractions, sinon, TestHelpers */
+
+    function isNotSafari() {
+      return !/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    }
+
     suite('basic', function() {
       var element;
+
+      suiteSetup(function() {
+        window.localStorage.setItem('jsonTableEnabled', false);
+      });
 
       setup(function() {
         element = fixture('basic');
       });
-
-      function isNotSafari() {
-        return !/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-      }
 
       test('Should set isParsed property', function(done) {
         element.contentType = 'text/plain';
@@ -70,38 +75,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           done();
         }, 2);
       });
+    });
 
-      test('Should set file content URL', TestHelpers.skipUnless(isNotSafari, function(done) {
+    suite('basic with data', function() {
+      var element;
+
+      suiteSetup(function() {
+        window.localStorage.setItem('jsonTableEnabled', false);
+      });
+
+      setup(function(done) {
+        element = fixture('basic');
         element.contentType = 'application/xml';
         element.responseText = '<test></test>';
         setTimeout(function() {
-          var button = Polymer.dom(element.root).querySelector('paper-icon-button[icon="arc:archive"]');
-          MockInteractions.tap(button);
-          assert.isString(element.downloadFileUrl);
-          assert.isString(element.downloadFileName);
-          done();
-        }, 2);
-      }));
-
-      test('Should fire save-content-to-file event', function(done) {
-        element.contentType = 'application/xml';
-        element.responseText = '<test></test>';
-        setTimeout(function() {
-          var spy = sinon.stub();
-          element.addEventListener('save-content-to-file', spy);
-          var button = Polymer.dom(element.root).querySelector('paper-icon-button[icon="arc:archive"]');
-          MockInteractions.tap(button);
-          assert.isTrue(spy.calledOnce, 'save-content-to-file was not fired');
           done();
         }, 2);
       });
 
-      test('Canceled save-content-to-file event will not display dialog', function(done) {
+      test('Should set file content URL', TestHelpers.skipUnless(isNotSafari, function() {
+        element.contentType = 'application/xml';
+        element.responseText = '<test></test>';
+        var button = Polymer.dom(element.root)
+          .querySelector('paper-icon-button[icon="arc:archive"]');
+        MockInteractions.tap(button);
+        assert.isString(element.downloadFileUrl);
+        assert.isString(element.downloadFileName);
+      }));
+
+      test('Should fire export-data event', function() {
+        element.contentType = 'application/xml';
+        element.responseText = '<test></test>';
+        var spy = sinon.stub();
+        element.addEventListener('export-data', spy);
+        var button = Polymer.dom(element.root)
+          .querySelector('paper-icon-button[icon="arc:archive"]');
+        MockInteractions.tap(button);
+        assert.isTrue(spy.calledOnce, 'export-data was fired');
+      });
+
+      test('Canceled export-data event will not display dialog', function(done) {
         element.contentType = 'application/xml';
         element.responseText = '<test></test>';
         var clb = function(e) {
           e.preventDefault();
-          element.removeEventListener('save-content-to-file', clb);
+          element.removeEventListener('export-data', clb);
           // Next event loop so the event will finish.
           setTimeout(function() {
             var dialog = Polymer.dom(element.root).querySelector('#saveDialog');
@@ -109,11 +127,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             done();
           }, 1);
         };
-        setTimeout(function() {
-          element.addEventListener('save-content-to-file', clb);
-          var button = Polymer.dom(element.root).querySelector('paper-icon-button[icon="arc:archive"]');
-          MockInteractions.tap(button);
-        }, 2);
+        element.addEventListener('export-data', clb);
+        var button = Polymer.dom(element.root).querySelector('paper-icon-button[icon="arc:archive"]');
+        MockInteractions.tap(button);
+      });
+
+      test('json-table-state-changed event displays the table', function() {
+        var event = new CustomEvent('json-table-state-changed', {
+          detail: {enabled: true},
+          bubbles: true,
+          composed: true
+        });
+        document.body.dispatchEvent(event);
+        assert.equal(element.activeView, 4);
+        assert.isTrue(element.jsonTableView);
+      });
+
+      test('jsonTableView change dispatches json-table-state-changed event', function() {
+        var eventData;
+        element.addEventListener('json-table-state-changed', function f(e) {
+          element.removeEventListener('export-data', f);
+          eventData = e.detail;
+        });
+        element.jsonTableView = false;
+        assert.typeOf(eventData, 'object');
+        assert.isFalse(eventData.enabled);
+      });
+
+      test('Enabling jsonTableView disables rawView', function() {
+        element.rawView = true;
+        TestHelpers.forceXIfStamp(element);
+        element.jsonTableView = true;
+        assert.isFalse(element.rawView, 'rawView is false');
+        assert.isUndefined(element.__parsedView, '__parsedView is undefined');
       });
     });
     </script>
