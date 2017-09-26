@@ -1,3 +1,13 @@
+<a name="0.1.15"></a>
+## [0.1.15](https://github.com/advanced-rest-client/response-body-view/compare/0.1.14...0.1.15) (2017-09-26)
+
+
+### Update
+
+* Updated tests configuration to new systsem. ([c493c430b3d46a55e65d797f53a89083fbbaf5b9](https://github.com/advanced-rest-client/response-body-view/commit/c493c430b3d46a55e65d797f53a89083fbbaf5b9))
+
+
+
 <a name="0.1.14"></a>
 ## [0.1.14](https://github.com/advanced-rest-client/response-body-view/compare/0.1.13...0.1.14) (2017-09-26)
 
