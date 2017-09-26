@@ -23,6 +23,7 @@ the License.
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../json-table/json-table.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
 
 <!--
 `<response-body-view>` An element to display a HTTP response body.
@@ -35,9 +36,10 @@ Note that the `contentType` property **must** be set in order to display any
 view.
 
 ### Save content to file
-The element will use web way of file saving. However, it will send the
-`save-content-to-file` first to check if hosting application implements native
-save functionality. See event description for more info.
+
+The element uses the web way of file saving. However, it sends the
+`export-data` custom event first to check if hosting application implements
+other save functionality. See event description for more information.
 
 ### Example
 ```
@@ -52,6 +54,14 @@ save functionality. See event description for more info.
 Custom property | Description | Default
 ----------------|-------------|----------
 `--response-body-view` | Mixin applied to the element | `{}`
+`--response-body-view-dialog-title` | Mixin applied to dialog title | `{}`
+`--response-body-view-preview-close` | Mixin applied to the response preview close button | `{}`
+`--response-body-view-content-actions` | Mixin applied to the content actions container | `{}`
+`--response-body-view-dialog-buttons` | Mixin applied to the dialog buttons container | `{}`
+`--response-body-view-dialog-close` | Mixin applied to dialog's close button | `{}`
+`--response-body-view-dialog-close-hover` | Mixin applied to dialog's close button when hovering | `{}`
+`--response-body-view-dialog-download` | Mixin applies to dialog's download button | `{}`
+`--response-body-view-dialog-download-hover` | Mixin applies to dialog's download button when hovering | `{}`
 
 @group UI Elements
 @element response-body-view
@@ -60,9 +70,10 @@ Custom property | Description | Default
 <dom-module id="response-body-view">
   <template>
     <style>
-     :host {
+    :host {
       display: block;
       position: relative;
+      @apply --response-body-view;
     }
 
     #webView {
@@ -77,19 +88,9 @@ Custom property | Description | Default
       min-width: 320px;
     }
 
-    .donnload-section {
-      @apply(--layout-vertical);
-      @apply(--layout-center);
-    }
-
-    .download-file-icon {
-      width: 64px;
-      height: 64px;
-      color: var(--response-body-view-download-icon, --accent-color);
-    }
-
     paper-icon-button[active] {
       background-color: var(--response-raw-viewer-button-active, #BDBDBD);
+      border-radius: 50%;
     }
 
     .close-preview {
@@ -98,56 +99,107 @@ Custom property | Description | Default
       right: 12px;
       background: #fff;
       color: rgba(0,0,0,0.74);
-      @apply(--response-body-preview-close);
+      @apply --response-body-view-preview-close;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .content-actions {
+      @apply --layout-horizontal;
+      @apply --layout-center;
+      @apply --response-body-view-content-actions;
+    }
+
+    .dialog-title {
+      @apply --arc-font-common-base;
+      @apply --response-body-view-dialog-title;
+    }
+
+    .buttons {
+      @apply --response-body-view-dialog-buttons;
+    }
+
+    .button-dismiss {
+      @apply --response-body-view-dialog-close;
+    }
+
+    .button-dismiss:hover {
+      @apply --response-body-view-dialog-close-hover;
+    }
+
+    .button-download {
+      @apply --response-body-view-dialog-download;
+    }
+
+    .button-download:hover {
+      @apply(--response-body-view-dialog-download-hover);
+    }
+
+    .download-link {
+      text-decoration: none;
+      color: inherit;
+      outline: none;
     }
     </style>
+    <template is="dom-if" if="[[hasData]]">
+      <div class="content-actions" hidden$="[[contentPreview]]">
+        <span>
+          <paper-icon-button icon="arc:content-copy" on-tap="_copyToClipboard"></paper-icon-button>
+          <paper-tooltip animation-delay="200">Copy content to clipboard</paper-tooltip>
+        </span>
+        <span>
+          <paper-icon-button icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
+          <paper-tooltip animation-delay="200">Save content to file</paper-tooltip>
+        </span>
+        <span>
+          <paper-icon-button icon="arc:code" toggles active="{{rawView}}"></paper-icon-button>
+          <paper-tooltip animation-delay="200">Toogle raw response view</paper-tooltip>
+        </span>
+        <template is="dom-if" if="[[_computeRenderPreviewResponse(activeView)]]">
+          <span>
+            <paper-icon-button icon="arc:visibility" toggles active="{{contentPreview}}"></paper-icon-button>
+            <paper-tooltip animation-delay="200">Preview response</paper-tooltip>
+          </span>
+        </template>
+        <template is="dom-if" if="[[isJson]]">
+          <span>
+            <paper-icon-button icon="arc:view-column" toggles active="{{jsonTableView}}"></paper-icon-button>
+            <paper-tooltip animation-delay="200">Toggle structured table view</paper-tooltip>
+          </span>
+        </template>
+        <template is="dom-if" if="[[_computeRenderWithRaw(activeView)]]">
+          <span>
+            <paper-icon-button icon="arc:wrap-text" toggles active="{{rawTextWrap}}"></paper-icon-button>
+            <paper-tooltip animation-delay="200">Toggle text wrapping</paper-tooltip>
+          </span>
+        </template>
+      </div>
+    </template>
+
     <iron-pages selected="{{activeView}}" hidden$="[[contentPreview]]">
       <section>
-        <response-raw-viewer response-text="[[_raw]]" wrap-text$="[[rawTextWrap]]">
-          <paper-icon-button content-action title="Copy content to clipboard" icon="arc:content-copy" on-tap="_copyToClipboard"></paper-icon-button>
-          <paper-icon-button content-action title="Save content to file" icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
-          <paper-icon-button content-action title="View with highlighted syntax" icon="arc:code" toggles active on-tap="toggleViewSource"></paper-icon-button>
-          <paper-icon-button content-action title="Preview response" icon="arc:visibility" toggles active="{{contentPreview}}"></paper-icon-button>
-          <paper-icon-button content-action title="Wrap or unwrap text" icon="arc:wrap-text" toggles active="{{rawTextWrap}}"></paper-icon-button>
-        </response-raw-viewer>
+        <response-raw-viewer response-text="[[_raw]]" wrap-text$="[[rawTextWrap]]"></response-raw-viewer>
       </section>
       <section>
         <template is="dom-if" if="[[isParsed]]" restamp="true">
-          <response-highlighter response-text="[[_raw]]" content-type="[[contentType]]">
-            <paper-icon-button content-action title="Copy content to clipboard" icon="arc:content-copy" on-tap="_copyToClipboard"></paper-icon-button>
-            <paper-icon-button content-action title="Save content to file" icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
-            <paper-icon-button content-action title="View raw response (without syntax highlighting)" icon="arc:code" on-tap="toggleViewSource"></paper-icon-button>
-            <paper-icon-button content-action title="Preview response" icon="arc:visibility" toggles active="{{contentPreview}}"></paper-icon-button>
-          </response-highlighter>
+          <response-highlighter response-text="[[_raw]]" content-type="[[contentType]]"></response-highlighter>
         </template>
       </section>
       <section>
         <template is="dom-if" if="[[isJson]]" restamp="true">
-          <json-viewer json="[[_raw]]">
-            <paper-icon-button content-action title="Copy content to clipboard" icon="arc:content-copy" on-tap="_copyToClipboard"></paper-icon-button>
-            <paper-icon-button content-action title="Save content to file" icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
-            <paper-icon-button content-action title="View raw response (without syntax highlighting)" icon="arc:code" on-tap="toggleViewSource"></paper-icon-button>
-            <paper-icon-button content-action title="View in a structured table" icon="arc:view-column" on-tap="toggleViewJsonTabble"></paper-icon-button>
-          </json-viewer>
+          <json-viewer json="[[_raw]]"></json-viewer>
         </template>
       </section>
       <section>
         <template is="dom-if" if="[[isXml]]" restamp="true">
-          <xml-viewer xml="[[_raw]]">
-            <paper-icon-button content-action title="Copy content to clipboard" icon="arc:content-copy" on-tap="_copyToClipboard"></paper-icon-button>
-            <paper-icon-button content-action title="Save content to file" icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
-            <paper-icon-button content-action title="View raw response (without syntax highlighting)" icon="arc:code" on-tap="toggleViewSource"></paper-icon-button>
-          </xml-viewer>
+          <xml-viewer xml="[[_raw]]"></xml-viewer>
         </template>
       </section>
       <section>
-        <template is="dom-if" if="[[isJsonTable]]">
-          <json-table json="[[_raw]]">
-            <paper-icon-button content-action title="Copy content to clipboard" icon="arc:content-copy" on-tap="_copyToClipboard"></paper-icon-button>
-            <paper-icon-button content-action title="Save content to file" icon="arc:archive" on-tap="_saveFile"></paper-icon-button>
-            <paper-icon-button content-action title="View raw response (without syntax highlighting)" icon="arc:code" on-tap="toggleViewSource"></paper-icon-button>
-            <paper-icon-button content-action title="View in a structured table" icon="arc:view-column" on-tap="toggleViewJsonTabble" toggles active></paper-icon-button>
-          </json-table>
+        <template is="dom-if" if="[[_computeRenderJsonTable(isJson, jsonTableView)]]" restamp="true">
+          <json-table json="[[_raw]]"></json-table>
         </template>
       </section>
     </iron-pages>
@@ -156,17 +208,15 @@ Custom property | Description | Default
     <paper-icon-button class="close-preview" title="Close the preview" icon="arc:close" on-tap="closePreview" hidden$="[[!contentPreview]]"></paper-icon-button>
 
     <paper-dialog id="saveDialog" on-iron-overlay-closed="_downloadDialogClose">
-      <h2>Save to file</h2>
+      <h2 class="dialog-title">Saving to file</h2>
       <div>
-        <p>Your file is ready to download. Click the icon below to save it to your local drive.</p>
-        <div class="donnload-section">
-          <a href$="[[downloadFileUrl]]" download$="[[downloadFileName]]" on-tap="_downloadIconTap" target="_blank">
-            <paper-icon-button icon="arc:file-download" class="download-file-icon" title="Download file"></paper-icon-button>
-          </a>
-        </div>
+        <p>Your file is now ready to download.</p>
       </div>
       <div class="buttons">
-        <paper-button dialog-dismiss autofocus>Close</paper-button>
+        <paper-button class="button-dismiss" dialog-dismiss>Close</paper-button>
+        <a href$="[[downloadFileUrl]]" autofocus download$="[[downloadFileName]]" on-tap="_downloadIconTap" target="_blank" class="download-link">
+          <paper-button class="button-download">Download file</paper-icon>
+        </a>
       </div>
     </paper-dialog>
 
@@ -187,21 +237,22 @@ Custom property | Description | Default
     window.URL = URL || webkitURL;
     Polymer({
       is: 'response-body-view',
-
       /**
-       * Fired when the user click on save to file button.
+       * Fired when the element request to export data outside the application.
        *
-       * Application can handle this event if it has a way to natively implement
-       * save to file functionality. In this case this event must be canceled
-       * by calling `preventDefault()` on it. If the event is not canceled then
-       * save to file dialog will appear with regular download link.
+       * Application can handle this event if it support native UX of file saving.
+       * In this case this event must be canceled by calling `preventDefault()`
+       * on it. If the event is not canceled then save to file dialog appears
+       * with a regular download link.
        *
-       * @event save-content-to-file
-       * @param {String} content A text to save in file.
+       * @event export-data
+       * @param {String} data A text to save in the file.
+       * @param {String} type Data content type
+       * @param {String} file Suggested file name
        */
       /**
-       * Fired when the `isJsonTable` property change to inform other elements to switch
-       * corresponding view as well.
+       * Fired when the `jsonTableView` property change to inform other
+       * elements to switch corresponding view as well.
        *
        * @event json-table-state-changed
        * @param {Boolean} enabled If true then the view is enabled.
@@ -287,14 +338,6 @@ Custom property | Description | Default
           readOnly: true
         },
         /**
-         * If true then the JSON table view is active for the JSON viewer
-         */
-        isJsonTable: {
-          type: Boolean,
-          readOnly: true,
-          observer: '_jsonTableChanged'
-        },
-        /**
          * Computed value, true if current environment support localStorage API.
          * Chrome API doesn't support this API.
          */
@@ -310,11 +353,23 @@ Custom property | Description | Default
               return false;
             }
           }
+        },
+        // If set it opens the "raw" view.
+        rawView: Boolean,
+        // If set it opens the JSON table view.
+        jsonTableView: Boolean,
+        // Computed value, true if `contentType` and `_raw` are set
+        hasData: {
+          value: false,
+          type: Boolean,
+          computed: '_computeHasData(contentType, _raw)'
         }
       },
 
       observers: [
-        '_contentTypeChanged(contentType, _raw)'
+        '_contentTypeChanged(contentType, _raw)',
+        '_toggleViewSource(rawView)',
+        '_jsonTableViewChanged(jsonTableView)'
       ],
 
       listeners: {
@@ -347,9 +402,7 @@ Custom property | Description | Default
         if (payload === null || payload === false) {
           return this.set('_raw', payload);
         }
-
         this.set('_raw', undefined);
-
         if (!payload) {
           return;
         }
@@ -357,6 +410,10 @@ Custom property | Description | Default
         this.debounce('set-raw', function() {
           this.set('_raw', this.responseText);
         }, 1);
+      },
+      // Computes value for `hasData` property
+      _computeHasData: function(contentType, _raw) {
+        return !!(contentType && _raw);
       },
 
       _contentTypeChanged: function(contentType) {
@@ -381,14 +438,27 @@ Custom property | Description | Default
         this._setIsJson(json);
         this._setIsParsed(parsed);
 
-        if (json && this.hasLocalStorage) {
-          var isTable = this._localStorageValueToBoolean(localStorage.jsonTableEnabled);
-          if (this.isJsonTable !== isTable) {
-            this._setIsJsonTable(isTable);
-          }
-          if (this.isJsonTable) {
-            this.activeView = 4;
-          }
+        if (json) {
+          this._ensureJsonTable();
+        }
+      },
+      /**
+       * When response's content type is JSON the view renders the
+       * JSON table element. This function reads current state for the table
+       * (if it is turned on) and handles view change if needed.
+       */
+      _ensureJsonTable: function() {
+        if (!this.hasLocalStorage) {
+          return;
+        }
+        var isTable = this._localStorageValueToBoolean(localStorage.jsonTableEnabled);
+        if (this.jsonTableView !== isTable) {
+          this.jsonTableView = isTable;
+        }
+        if (this.jsonTableView) {
+          this.activeView = 4;
+        } else if (this.activeView === 4) {
+          this.activeView = 2;
         }
       },
 
@@ -465,12 +535,14 @@ Custom property | Description | Default
       },
 
       /**
-       * Firest the `save-content-to-file` event. If the event is not canceled
+       * Fires the `export-data` custom event. If the event is not canceled
        * then it will use default web implementation for file saving.
        */
       _saveFile: function() {
-        var e = this.fire('save-content-to-file', {
-          content: this._raw
+        var e = this.fire('export-data', {
+          data: this._raw,
+          type: this.contentType,
+          file: 'response-data-export'
         }, {
           cancelable: true
         });
@@ -521,31 +593,38 @@ Custom property | Description | Default
       /**
        * Toggles "view source" or raw message view.
        */
-      toggleViewSource: function() {
-        if (this.__parsedView) {
+      _toggleViewSource: function(opened) {
+        if (!opened) {
+          if (!this.__parsedView) {
+            return;
+          }
           this.activeView = this.__parsedView;
           this.__parsedView = undefined;
-          if (this.activeView === 2 && this.isJsonTable) {
-            this._setIsJsonTable(false);
+          if (this.activeView === 2 && this.jsonTableView) {
+            this.jsonTableView = false;
           }
         } else {
+          if (this.jsonTableView) {
+            this._skipJsonTableEvent = true;
+            this.jsonTableView = false;
+            this._skipJsonTableEvent = false;
+          }
           this.__parsedView = this.activeView;
           this.activeView = 0;
         }
       },
-
-      toggleViewJsonTabble: function() {
-        if (this.isJsonTable) {
-          this.activeView = 2;
-          this._setIsJsonTable(false);
-        } else {
+      // Handler for the `jsonTableView` property change.
+      _jsonTableViewChanged: function(state) {
+        if (state) {
+          if (this.rawView) {
+            this.__parsedView = undefined;
+            this.rawView = false;
+          }
           this.activeView = 4;
-          this._setIsJsonTable(true);
+        } else {
+          this.activeView = 2;
         }
-      },
-      // Handler to the isJsonTable change, fires corresponding event and sets local storage.
-      _jsonTableChanged: function(state) {
-        if (state === undefined) {
+        if (this._skipJsonTableEvent) {
           return;
         }
         if (this.hasLocalStorage && localStorage.jsonTableEnabled !== String(state)) {
@@ -556,8 +635,8 @@ Custom property | Description | Default
         });
       },
       /**
-       * Updates the value of the `isJsonTable` property when the corresponding localStorage
-       * property change.
+       * Updates the value of the `jsonTableView` property when the
+       * corresponding localStorage property change.
        */
       _onStorageChanged: function(e) {
         if (e.key !== 'jsonTableEnabled') {
@@ -567,8 +646,10 @@ Custom property | Description | Default
           return;
         }
         var v = this._localStorageValueToBoolean(e.newValue);
-        if (this.isJsonTable !== v) {
-          this._setIsJsonTable(v);
+        if (this.jsonTableView !== v) {
+          this._skipJsonTableEvent = true;
+          this.jsonTableView = v;
+          this._skipJsonTableEvent = false;
         }
       },
       /**
@@ -594,8 +675,10 @@ Custom property | Description | Default
           return;
         }
         var enabled = e.detail.enabled;
-        if (enabled !== this.isJsonTable) {
-          this._setIsJsonTable(enabled);
+        if (enabled !== this.jsonTableView) {
+          this._skipJsonTableEvent = true;
+          this.jsonTableView = enabled;
+          this._skipJsonTableEvent = false;
         }
       },
 
@@ -611,6 +694,28 @@ Custom property | Description | Default
         this.activeView = 0;
         this.$.highlightTimeout.text = e.detail.message;
         this.$.highlightTimeout.opened = true;
+      },
+
+      _computeRenderWithRaw: function(activeView) {
+        return activeView === 0 ? true : false;
+      },
+
+      _computeRenderShowRaw: function(activeView) {
+        return activeView === 0 ? false : true;
+      },
+
+      _computeRenderPreviewResponse: function(activeView) {
+        return activeView === 1 ? true : false;
+      },
+
+      _computeRenderToggleTable: function(activeView) {
+        return activeView === 4 || activeView === 2 ? true : false;
+      },
+      /**
+       * Computes boolean value whether to render the JSON table element.
+       */
+      _computeRenderJsonTable: function(isJson, jsonTableView) {
+        return !!(isJson && jsonTableView);
       }
     });
   })();
