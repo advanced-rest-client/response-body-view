@@ -1,3 +1,13 @@
+<a name="0.1.14"></a>
+## [0.1.14](https://github.com/advanced-rest-client/response-body-view/compare/0.1.13...0.1.14) (2017-09-26)
+
+
+### Fix
+
+* Many fixes for reported bugs. ([407c0c270a46a9fdc892fb49b350a42d3a306fb8](https://github.com/advanced-rest-client/response-body-view/commit/407c0c270a46a9fdc892fb49b350a42d3a306fb8))
+
+
+
 <a name="0.1.13"></a>
 ## [0.1.13](https://github.com/advanced-rest-client/response-body-view/compare/0.1.11...0.1.13) (2017-09-21)
 
