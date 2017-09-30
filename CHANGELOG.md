@@ -1,3 +1,17 @@
+<a name="0.1.16"></a>
+## [0.1.16](https://github.com/advanced-rest-client/response-body-view/compare/0.1.15...0.1.16) (2017-09-30)
+
+
+### Fix
+
+* Fixed test for IE ([00988da3aae223b3ca51fdb4ad6aceaa08967dd6](https://github.com/advanced-rest-client/response-body-view/commit/00988da3aae223b3ca51fdb4ad6aceaa08967dd6))
+
+### New
+
+* Added support for build in text search ([d5baa6e8439f30d0bb13d6a26d416a2a13ccd739](https://github.com/advanced-rest-client/response-body-view/commit/d5baa6e8439f30d0bb13d6a26d416a2a13ccd739))
+
+
+
 <a name="0.1.15"></a>
 ## [0.1.15](https://github.com/advanced-rest-client/response-body-view/compare/0.1.14...0.1.15) (2017-09-26)
 

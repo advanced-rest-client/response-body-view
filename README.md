@@ -24,6 +24,26 @@ other save functionality. See event description for more information.
   content-type="text/plain"></response-body-view>
 ```
 
+### Build in text search
+
+In some environments (like Chrome applications) text search is not offered by
+the platform and it must be build into the application. This element support
+such situaltion by handling search events:
+
+-   `search-bar-opened-changed` Means that the search bar has been opened / closed
+-   `search-bar-input-changed` Means that the user provided a value to the search input
+-   `search-bar-search-position-changed` Means that the user requested to highlight next / previous item.
+
+`search-bar-opened-changed` and `search-bar-input-changed` have `lastTarget` and
+`value` properties set on the `detail` object. `value` (String) represents user input and
+`lastTarget` (HTMLElement or undefined), if set, represents last view that interacted with the element.
+If the `lastTarget` is set and is not this element then it will not handle the event.
+
+`search-bar-search-position-changed` contains `position` (Number) that represents index
+of the maked word to highlight. `searchTarget` means the same as `lastTarget`.
+
+The element listend for the events on `window` object.
+
 ### Styling
 `<response-body-view>` provides the following custom properties and mixins for styling:
 
@@ -48,3 +68,5 @@ Custom property | Description | Default
 type **String** - Data content type |
 file **String** - Suggested file name |
 | json-table-state-changed | Fired when the `jsonTableView` property change to inform other elements to switch corresponding view as well. | enabled **Boolean** - If true then the view is enabled. |
+| search-bar-search-mark-count | Fired when text search on the element has been performed and number of search results are ready. | count **Number** - Number of marked words |
+searchTarget **HTMLElement** - This element. |

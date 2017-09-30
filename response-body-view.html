@@ -48,6 +48,26 @@ other save functionality. See event description for more information.
   content-type="text/plain"></response-body-view>
 ```
 
+### Build in text search
+
+In some environments (like Chrome applications) text search is not offered by
+the platform and it must be build into the application. This element support
+such situaltion by handling search events:
+
+-   `search-bar-opened-changed` Means that the search bar has been opened / closed
+-   `search-bar-input-changed` Means that the user provided a value to the search input
+-   `search-bar-search-position-changed` Means that the user requested to highlight next / previous item.
+
+`search-bar-opened-changed` and `search-bar-input-changed` have `lastTarget` and
+`value` properties set on the `detail` object. `value` (String) represents user input and
+`lastTarget` (HTMLElement or undefined), if set, represents last view that interacted with the element.
+If the `lastTarget` is set and is not this element then it will not handle the event.
+
+`search-bar-search-position-changed` contains `position` (Number) that represents index
+of the maked word to highlight. `searchTarget` means the same as `lastTarget`.
+
+The element listend for the events on `window` object.
+
 ### Styling
 `<response-body-view>` provides the following custom properties and mixins for styling:
 
@@ -257,6 +277,14 @@ Custom property | Description | Default
        * @event json-table-state-changed
        * @param {Boolean} enabled If true then the view is enabled.
        */
+      /**
+       * Fired when text search on the element has been performed and
+       * number of search results are ready.
+       *
+       * @event search-bar-search-mark-count
+       * @param {Number} count Number of marked words
+       * @param {HTMLElement} searchTarget This element.
+       */
       properties: {
         /**
          * Raw response as a response text.
@@ -379,12 +407,17 @@ Custom property | Description | Default
       attached: function() {
         this.listen(window, 'storage', '_onStorageChanged');
         this.listen(window, 'json-table-state-changed', '_onJsonTableStateChanged');
-
+        this.listen(window, 'search-bar-opened-changed', '_searchBarOpenedChanged');
+        this.listen(window, 'search-bar-input-changed', '_searchInputChanged');
+        this.listen(window, 'search-bar-search-position-changed', '_searchPositionChanged');
       },
 
       detached: function() {
         this.unlisten(window, 'storage', '_onStorageChanged');
         this.unlisten(window, 'json-table-state-changed', '_onJsonTableStateChanged');
+        this.unlisten(window, 'search-bar-opened-changed', '_searchBarOpenedChanged');
+        this.unlisten(window, 'search-bar-input-changed', '_searchInputChanged');
+        this.unlisten(window, 'search-bar-search-position-changed', '_searchPositionChanged');
         if (this.__previewUrl) {
           window.URL.revokeObjectURL(this.__previewUrl);
           this.__previewUrl = undefined;
@@ -716,6 +749,50 @@ Custom property | Description | Default
        */
       _computeRenderJsonTable: function(isJson, jsonTableView) {
         return !!(isJson && jsonTableView);
+      },
+      // Called when search bar has been opened / closed
+      _searchBarOpenedChanged: function(e) {
+        this._searchInputChanged(e);
+      },
+
+      // search in response tab
+      _searchInputChanged: function(e) {
+        if (e.detail.lastTarget && e.detail.lastTarget !== this) {
+          return;
+        }
+        var panel;
+        switch (this.activeView) {
+          case 0: panel = 'response-raw-viewer'; break;
+          case 1: panel = 'response-highlighter'; break;
+          case 2: panel = 'json-viewer'; break;
+          case 3: panel = 'xml-viewer'; break;
+          default: return;
+        }
+        var element = this.$$(panel);
+        element.cleanMarked();
+        element.mark(e.detail.value);
+        var marked = element.markedCount;
+        this.fire('search-bar-search-mark-count', {
+          count: marked,
+          searchTarget: this
+        });
+      },
+      // Called when a search bar changed a position of a word
+      _searchPositionChanged: function(e) {
+        if (e.detail.searchTarget && e.detail.searchTarget !== this) {
+          return;
+        }
+        var panel;
+        switch (this.activeView) {
+          case 0: panel = 'response-raw-viewer'; break;
+          case 1: panel = 'response-highlighter'; break;
+          case 2: panel = 'json-viewer'; break;
+          case 3: panel = 'xml-viewer'; break;
+          default: return;
+        }
+        var element = this.$$(panel);
+        element.clearMarked();
+        element.setMarked(e.detail.position);
       }
     });
   })();
