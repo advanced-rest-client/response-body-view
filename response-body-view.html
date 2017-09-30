@@ -791,8 +791,8 @@ Custom property | Description | Default
           default: return;
         }
         var element = this.$$(panel);
-        element.cleanMarked();
-        element.setMarked(e.detail.position);
+        element.clearHighlight();
+        element.highlightMarked(e.detail.position);
       }
     });
   })();
