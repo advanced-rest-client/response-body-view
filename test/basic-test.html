@@ -89,13 +89,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         element.contentType = 'application/xml';
         element.responseText = '<test></test>';
         setTimeout(function() {
+          TestHelpers.forceXIfStamp(element);
           done();
-        }, 2);
+        }, 20);
       });
 
       test('Should set file content URL', TestHelpers.skipUnless(isNotSafari, function() {
-        element.contentType = 'application/xml';
-        element.responseText = '<test></test>';
+        assert.isTrue(element.hasData, 'hasData is computed');
         var button = Polymer.dom(element.root)
           .querySelector('paper-icon-button[icon="arc:archive"]');
         MockInteractions.tap(button);
