@@ -1,3 +1,13 @@
+<a name="0.1.18"></a>
+## [0.1.18](https://github.com/advanced-rest-client/response-body-view/compare/0.1.17...0.1.18) (2017-09-30)
+
+
+### Fix
+
+* Fixed function call name. ([2b01b1aaaff5a8cf2b7587f7589941ea75faa46f](https://github.com/advanced-rest-client/response-body-view/commit/2b01b1aaaff5a8cf2b7587f7589941ea75faa46f))
+
+
+
 <a name="0.1.17"></a>
 ## [0.1.17](https://github.com/advanced-rest-client/response-body-view/compare/0.1.16...0.1.17) (2017-09-30)
 
