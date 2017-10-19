@@ -1,3 +1,13 @@
+<a name="0.1.22"></a>
+## [0.1.22](https://github.com/advanced-rest-client/response-body-view/compare/0.1.21...0.1.22) (2017-10-19)
+
+
+### New
+
+* Added test cases. ([eca1246249f8c2b9982a0566d060fb4721877d59](https://github.com/advanced-rest-client/response-body-view/commit/eca1246249f8c2b9982a0566d060fb4721877d59))
+
+
+
 <a name="0.1.21"></a>
 ## [0.1.21](https://github.com/advanced-rest-client/response-body-view/compare/0.1.20...0.1.21) (2017-09-30)
 
