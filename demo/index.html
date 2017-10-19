@@ -49,6 +49,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <h3>The `response-body-view`</h3>
     <demo-snippet>
       <template is="dom-bind">
+        <div class="selector">
+          <label for="sourceSelector">Select predefined resource</label>
+          <select id="sourceSelector">
+            <option value="">select an option</option>
+            <option value="../test/person.json">Test case - json</option>
+            <option value="../test/xml1.xml">Test case - xml</option>
+            <option value="../test/invalid.json">Test case - invalid json</option>
+            <option value="../test/test.html">Test case - html</option>
+            <option value="../test/large.html">Test case - large payload</option>
+          </select>
+        </div>
         <div class="url-input">
           <paper-input label="URL" value="{{url}}"></paper-input>
           <paper-button raised on-tap="download">go</paper-button>
@@ -87,6 +98,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     scope._additionalAction = function() {
       document.querySelector('paper-toast').opened = true;
     };
+    scope.replaceUrl = function(url) {
+      if (url[0] === '/' || url[0] === '.') {
+        var base = location.protocol + '//' + location.host + '' + location.pathname;
+        if (url[0] === '/' && base[base.length - 1] === '/') {
+          url = url.substr(1);
+        }
+        if (url[0] === '.' && base[base.length - 1] !== '/') {
+          base += '/';
+        }
+        url = base + url;
+      }
+      scope.url = url;
+      scope.download();
+    };
+    window.addEventListener('WebComponentsReady', function() {
+      document.getElementById('sourceSelector').addEventListener('change', function(e) {
+        var value = e.target.value;
+        if (!value) {
+          return;
+        }
+        scope.replaceUrl(value);
+      });
+    });
   </script>
 </body>
 </html>
