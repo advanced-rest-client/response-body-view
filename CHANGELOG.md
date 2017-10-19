@@ -1,3 +1,9 @@
+<a name="0.1.23"></a>
+## [0.1.23](https://github.com/advanced-rest-client/response-body-view/compare/0.1.22...0.1.23) (2017-10-19)
+
+
+
+
 <a name="0.1.22"></a>
 ## [0.1.22](https://github.com/advanced-rest-client/response-body-view/compare/0.1.21...0.1.22) (2017-10-19)
 
