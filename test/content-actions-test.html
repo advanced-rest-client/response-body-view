@@ -18,12 +18,7 @@
     </test-fixture>
 
     <script>
-    /* global MockInteractions, TestHelpers, sinon */
-
-    function isNotSafari() {
-      return !/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    }
-
+    /* global MockInteractions */
     suite('Content actions', () => {
       let element;
 
@@ -110,12 +105,12 @@
 
         const selector = 'paper-icon-button[data-action="save-file"]';
 
-        test('Sets file content URL', TestHelpers.skipUnless(isNotSafari, () => {
+        test('Sets file content URL', () => {
           const button = element.shadowRoot.querySelector(selector);
           MockInteractions.tap(button);
           assert.isString(element.downloadFileUrl);
           assert.isString(element.downloadFileName);
-        }));
+        });
 
         test('Dispatches export-data event', (done) => {
           element.addEventListener('export-data', (e) => {
@@ -225,52 +220,76 @@
           assert.ok(button);
         });
 
-        test('Toggles contentPreview property', () => {
+        test('Toggles contentPreview property', (done) => {
+          element.$.webView.addEventListener('load', () => {
+            setTimeout(() => done(), 5);
+          });
           const button = element.shadowRoot.querySelector(selector);
           MockInteractions.tap(button);
           assert.isTrue(element.contentPreview);
         });
 
-        test('contentPreview hides content actions', () => {
+        test('contentPreview hides content actions', (done) => {
+          element.$.webView.addEventListener('load', () => {
+            setTimeout(() => done(), 5);
+          });
           element.contentPreview = true;
           const panel = element.shadowRoot.querySelector('.content-actions');
           const display = getComputedStyle(panel).display;
           assert.equal(display, 'none');
         });
 
-        test('contentPreview hides main content', () => {
+        test('contentPreview hides main content', (done) => {
+          element.$.webView.addEventListener('load', () => {
+            setTimeout(() => done(), 5);
+          });
           element.contentPreview = true;
           const panel = element.shadowRoot.querySelector('iron-pages');
           const display = getComputedStyle(panel).display;
           assert.equal(display, 'none');
         });
 
-        test('Renders iframe', () => {
+        test('Renders iframe', (done) => {
+          element.$.webView.addEventListener('load', () => {
+            setTimeout(() => done(), 5);
+          });
           element.contentPreview = true;
           const panel = element.shadowRoot.querySelector('iframe');
           const display = getComputedStyle(panel).display;
           assert.notEqual(display, 'none');
         });
 
-        test('Renders iframe close button', () => {
+        test('Renders iframe close button', (done) => {
+          element.$.webView.addEventListener('load', () => {
+            setTimeout(() => done(), 5);
+          });
           element.contentPreview = true;
           const panel = element.shadowRoot.querySelector('.close-preview');
           const display = getComputedStyle(panel).display;
           assert.notEqual(display, 'none');
         });
 
-        test('iframe src is set', () => {
+        test('iframe src is set', (done) => {
+          element.$.webView.addEventListener('load', () => {
+            setTimeout(() => done(), 5);
+          });
           element.contentPreview = true;
           const panel = element.shadowRoot.querySelector('iframe');
           assert.typeOf(panel.src, 'string');
         });
 
-        test('__previewUrl is set', () => {
+        test('__previewUrl is set', (done) => {
+          element.$.webView.addEventListener('load', () => {
+            setTimeout(() => done(), 5);
+          });
           element.contentPreview = true;
           assert.typeOf(element.__previewUrl, 'string');
         });
 
-        test('iframe src is __previewUrl', () => {
+        test('iframe src is __previewUrl', (done) => {
+          element.$.webView.addEventListener('load', () => {
+            setTimeout(() => done(), 5);
+          });
           element.contentPreview = true;
           const panel = element.shadowRoot.querySelector('iframe');
           assert.equal(panel.src, element.__previewUrl);
