@@ -1,0 +1,326 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/test-helpers.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+    <link rel="import" href="../response-body-view.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <response-body-view></response-body-view>
+      </template>
+    </test-fixture>
+
+    <script>
+    /* global MockInteractions, TestHelpers, sinon */
+
+    function isNotSafari() {
+      return !/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    }
+
+    suite('Content actions', () => {
+      let element;
+
+      suite('No data', () => {
+        setup((done) => {
+          element = fixture('basic');
+          flush(() => done());
+        });
+
+        test('hasData is false', () => {
+          assert.isFalse(element.hasData);
+        });
+
+        test('content-actions is not rendered', () => {
+          const panel = element.shadowRoot.querySelector('.content-actions');
+          assert.notOk(panel);
+        });
+      });
+
+      suite('With data', () => {
+        setup((done) => {
+          element = fixture('basic');
+          element.contentType = 'text/plain';
+          element.responseText = 'Test';
+          flush(() => done());
+        });
+
+        test('hasData is true', () => {
+          assert.isTrue(element.hasData);
+        });
+
+        test('content-actions is rendered', () => {
+          const panel = element.shadowRoot.querySelector('.content-actions');
+          assert.ok(panel);
+        });
+      });
+
+      suite('Clipboard copy content action', () => {
+        setup((done) => {
+          element = fixture('basic');
+          element.contentType = 'text/plain';
+          element.responseText = 'Test';
+          flush(() => done());
+        });
+
+        test('Clipboard copy dispatches content-copy event', (done) => {
+          element.addEventListener('content-copy', (e) => {
+            assert.equal(e.detail.value, 'Test', 'Event has value');
+            done();
+          });
+          const button = element.shadowRoot.querySelector('paper-icon-button[data-action="clipboard-copy"]');
+          MockInteractions.tap(button);
+        });
+
+        test('Clipboard copy icon changes', () => {
+          element.addEventListener('content-copy', (e) => {
+            e.preventDefault();
+          });
+          const button = element.shadowRoot.querySelector('paper-icon-button[data-action="clipboard-copy"]');
+          MockInteractions.tap(button);
+          assert.equal(button.icon, 'arc:done');
+        });
+
+        test('Clipboard copy icon changes back', (done) => {
+          element.addEventListener('content-copy', (e) => {
+            e.preventDefault();
+          });
+          const button = element.shadowRoot.querySelector('paper-icon-button[data-action="clipboard-copy"]');
+          MockInteractions.tap(button);
+          setTimeout(() => {
+            assert.equal(button.icon, 'arc:content-copy');
+            done();
+          }, 1005);
+        });
+      });
+
+      suite('Export content action', () => {
+        setup((done) => {
+          element = fixture('basic');
+          element.contentType = 'application/xml';
+          element.responseText = '<test></test>';
+          flush(() => done());
+        });
+
+        const selector = 'paper-icon-button[data-action="save-file"]';
+
+        test('Sets file content URL', TestHelpers.skipUnless(isNotSafari, () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          assert.isString(element.downloadFileUrl);
+          assert.isString(element.downloadFileName);
+        }));
+
+        test('Dispatches export-data event', (done) => {
+          element.addEventListener('export-data', (e) => {
+            assert.equal(e.detail.data, element.responseText, 'data is set');
+            assert.equal(e.detail.type, element.contentType, 'type is set');
+            assert.equal(e.detail.file, 'response-data-export', 'file is set');
+            done();
+          });
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+        });
+
+        test('Canceled export-data event does not display save dialog', function(done) {
+          element.addEventListener('export-data', (e) => {
+            e.preventDefault();
+          });
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          setTimeout(() => {
+            const dialog = element.shadowRoot.querySelector('#saveDialog');
+            assert.isFalse(dialog.opened);
+            done();
+          }, 1);
+        });
+
+        test('Not canceled export-data event displays save dialog', function(done) {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          setTimeout(() => {
+            const dialog = element.shadowRoot.querySelector('#saveDialog');
+            assert.isTrue(dialog.opened);
+            done();
+          }, 1);
+        });
+      });
+
+      suite('Toggle raw content action', () => {
+        setup((done) => {
+          element = fixture('basic');
+          element.contentType = 'text/html';
+          element.responseText = '<test></test>';
+          flush(() => done());
+        });
+        const selector = 'paper-icon-button[data-action="raw-toggle"]';
+        test('rawView is not enabled', () => {
+          assert.isFalse(element.rawView);
+        });
+
+        test('Changes activeView to 0', () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          assert.equal(element.activeView, 0);
+        });
+
+        test('Sets __parsedView to previouslt selected view', () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          assert.equal(element.__parsedView, 1);
+        });
+
+        test('response-raw-viewer is visible', () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          const panel = element.shadowRoot.querySelector('response-raw-viewer');
+          const display = getComputedStyle(panel).display;
+          assert.notEqual(display, 'none');
+        });
+
+        test('Changes activeView to previously enabled view', () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          assert.equal(element.activeView, 0);
+          MockInteractions.tap(button);
+          assert.equal(element.activeView, 1);
+        });
+
+        test('response-raw-viewer is hidden when disabled', () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          MockInteractions.tap(button);
+          const panel = element.shadowRoot.querySelector('response-raw-viewer');
+          const display = getComputedStyle(panel).display;
+          assert.equal(display, 'none');
+        });
+
+        test('__parsedView is unset when disabled', () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          MockInteractions.tap(button);
+          assert.isUndefined(element.__parsedView);
+        });
+      });
+
+      suite('Preview content action', () => {
+        setup((done) => {
+          element = fixture('basic');
+          element.contentType = 'text/html';
+          element.responseText = '<a>test</a>';
+          flush(() => done());
+        });
+
+        const selector = 'paper-icon-button[data-action="preview"]';
+
+        test('Button is rendered', () => {
+          assert.equal(element.activeView, 1);
+          const button = element.shadowRoot.querySelector(selector);
+          assert.ok(button);
+        });
+
+        test('Toggles contentPreview property', () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          assert.isTrue(element.contentPreview);
+        });
+
+        test('contentPreview hides content actions', () => {
+          element.contentPreview = true;
+          const panel = element.shadowRoot.querySelector('.content-actions');
+          const display = getComputedStyle(panel).display;
+          assert.equal(display, 'none');
+        });
+
+        test('contentPreview hides main content', () => {
+          element.contentPreview = true;
+          const panel = element.shadowRoot.querySelector('iron-pages');
+          const display = getComputedStyle(panel).display;
+          assert.equal(display, 'none');
+        });
+
+        test('Renders iframe', () => {
+          element.contentPreview = true;
+          const panel = element.shadowRoot.querySelector('iframe');
+          const display = getComputedStyle(panel).display;
+          assert.notEqual(display, 'none');
+        });
+
+        test('Renders iframe close button', () => {
+          element.contentPreview = true;
+          const panel = element.shadowRoot.querySelector('.close-preview');
+          const display = getComputedStyle(panel).display;
+          assert.notEqual(display, 'none');
+        });
+
+        test('iframe src is set', () => {
+          element.contentPreview = true;
+          const panel = element.shadowRoot.querySelector('iframe');
+          assert.typeOf(panel.src, 'string');
+        });
+
+        test('__previewUrl is set', () => {
+          element.contentPreview = true;
+          assert.typeOf(element.__previewUrl, 'string');
+        });
+
+        test('iframe src is __previewUrl', () => {
+          element.contentPreview = true;
+          const panel = element.shadowRoot.querySelector('iframe');
+          assert.equal(panel.src, element.__previewUrl);
+        });
+      });
+
+      suite('Toggle JSON table content action', () => {
+        setup((done) => {
+          window.localStorage.setItem('jsonTableEnabled', false);
+          element = fixture('basic');
+          element.contentType = 'application/json';
+          element.responseText = '{}';
+          flush(() => done());
+        });
+        const selector = 'paper-icon-button[data-action="json-table"]';
+        test('jsonTableView is not enabled', () => {
+          assert.isFalse(element.jsonTableView);
+        });
+
+        test('Sets activeView to 4', () => {
+          const button = element.shadowRoot.querySelector(selector);
+          MockInteractions.tap(button);
+          assert.equal(element.activeView, 4);
+        });
+
+        test('Renders json-table', (done) => {
+          element.jsonTableView = true;
+          flush(() => {
+            const panel = element.shadowRoot.querySelector('json-table');
+            const display = getComputedStyle(panel).display;
+            assert.notEqual(display, 'none');
+            done();
+          });
+        });
+        // TEST BELOW FREEZE CHROME
+        // test('Updates jsonTableEnabled in local storage', () => {
+        //   element.jsonTableView = true;
+        //   assert.equal(localStorage.jsonTableEnabled, 'true');
+        // });
+        //
+        // test('Dispatches json-table-state-changed event', (done) => {
+        //   element.addEventListener('json-table-state-changed', (e) => {
+        //     assert.isTrue(e.detail.enabled);
+        //     done();
+        //   });
+        //   element.jsonTableView = true;
+        // });
+      });
+    });
+    </script>
+
+  </body>
+</html>
