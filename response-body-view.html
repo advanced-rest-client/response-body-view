@@ -282,14 +282,6 @@ the License.
         },
         // Is true then the text in "raw" preview will be wrapped.
         rawTextWrap: Boolean,
-        // Computed value. True is current browser is Safari - the new IE.
-        isSafari: {
-          type: Boolean,
-          value: function() {
-            return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-          },
-          readOnly: true
-        },
         // If set it opens the "raw" view.
         rawView: {
           type: Boolean,
@@ -451,7 +443,9 @@ the License.
     _openResponsePreview() {
       const context = this;
       function onLoad() {
-        context.$.webView.contentWindow.document.body.innerHTML = context._raw;
+        try {
+          context.$.webView.contentWindow.document.body.innerHTML = context._raw;
+        } catch (_) {}
         setTimeout(() => {
           context._resizePreviewWindow(context.$.webView.contentWindow.document.body.clientHeight);
         }, 2);
@@ -467,7 +461,9 @@ the License.
     }
     // Closes response preview
     _closeResponsePreview() {
-      this.$.webView.contentWindow.document.body.innerHTML = '';
+      try {
+        this.$.webView.contentWindow.document.body.innerHTML = '';
+      } catch (_) {}
     }
     /**
      * Sets height for the preview iframe
@@ -516,11 +512,7 @@ the License.
       if (e.defaultPrevented) {
         return;
       }
-      if (this.isSafari) {
-        this.$.safariDownload.opened = true;
-      } else {
-        this.saveToFile();
-      }
+      this.saveToFile();
     }
     /**
      * Creates a file object form current response text and opens a dialog
