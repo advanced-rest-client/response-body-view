@@ -229,16 +229,6 @@
           assert.isTrue(element.contentPreview);
         });
 
-        test('contentPreview hides content actions', (done) => {
-          element.$.webView.addEventListener('load', () => {
-            setTimeout(() => done(), 5);
-          });
-          element.contentPreview = true;
-          const panel = element.shadowRoot.querySelector('.content-actions');
-          const display = getComputedStyle(panel).display;
-          assert.equal(display, 'none');
-        });
-
         test('contentPreview hides main content', (done) => {
           element.$.webView.addEventListener('load', () => {
             setTimeout(() => done(), 5);
