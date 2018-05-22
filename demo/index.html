@@ -1,23 +1,12 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-
   <title>response-body-view demo</title>
-
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-
+  <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
@@ -26,61 +15,61 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
   <link rel="import" href="../../paper-toast/paper-toast.html">
   <link rel="import" href="../../fetch-polyfill/fetch-polyfill.html">
-
   <link rel="import" href="../response-body-view.html">
-
-  <style is="custom-style" include="demo-pages-shared-styles">
-
-    .vertical-section-container {
-      max-width: 600px;
-    }
-
+  <custom-style>
+    <style is="custom-style" include="demo-pages-shared-styles">
     .url-input {
-      @apply(--layout-horizontal);
-    }
-    .url-input paper-input {
-      @apply(--layout-flex);
+      @apply --layout-horizontal;
     }
 
-  </style>
+    .url-input paper-input {
+      @apply --layout-flex;
+    }
+    </style>
+  </custom-style>
 </head>
 <body unresolved>
   <div class="vertical-section-container centered">
     <h3>The `response-body-view`</h3>
     <demo-snippet>
-      <template is="dom-bind">
-        <div class="selector">
-          <label for="sourceSelector">Select predefined resource</label>
-          <select id="sourceSelector">
-            <option value="">select an option</option>
-            <option value="../test/person.json">Test case - json</option>
-            <option value="../test/xml1.xml">Test case - xml</option>
-            <option value="../test/invalid.json">Test case - invalid json</option>
-            <option value="../test/test.html">Test case - html</option>
-            <option value="../test/large.html">Test case - large payload</option>
-          </select>
-        </div>
-        <div class="url-input">
-          <paper-input label="URL" value="{{url}}"></paper-input>
-          <paper-button raised on-tap="download">go</paper-button>
-        </div>
-        <response-body-view response-text="[[response]]" content-type="[[contentType]]"></response-body-view>
+      <template>
+        <dom-bind id="demo">
+          <template is="dom-bind">
+            <div class="selector">
+              <label for="sourceSelector">Select predefined resource</label>
+              <select id="sourceSelector">
+                <option value="">select an option</option>
+                <option value="person.json">Test case - json</option>
+                <option value="xml1.xml">Test case - xml</option>
+                <option value="invalid.json">Test case - invalid json</option>
+                <option value="test.html">Test case - html</option>
+                <option value="large.html">Test case - large payload</option>
+              </select>
+            </div>
+            <div class="url-input">
+              <paper-input label="URL" value="{{url}}"></paper-input>
+              <paper-button raised on-tap="download">go</paper-button>
+            </div>
+            <response-body-view response-text="[[response]]" content-type="[[contentType]]"></response-body-view>
+          </template>
+        </dom-bind>
       </template>
     </demo-snippet>
     <paper-toast text="Additional action clicked"></paper-toast>
   </div>
   <script>
-    var scope = document.querySelector('template[is="dom-bind"]');
+  window.addEventListener('WebComponentsReady', () => {
+    const scope = document.getElementById('demo');
     // scope.url = 'https://cdn.rawgit.com/jarrodek/ChromeRestClient/develop/tasks/test-data/xml1.xml';
     scope.url = 'https://cdn.rawgit.com/raml-org/raml-examples/367423e7/schemas/person.json';
     scope.response = '';
     scope.contentType = '';
     scope.download = function() {
-      var opts = {
+      const opts = {
         method: 'GET',
         mode: 'cors'
       };
-      var ct;
+      let ct;
       fetch(scope.url, opts)
       .then(function(response) {
         ct = response.headers.get('content-type');
@@ -98,29 +87,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     scope._additionalAction = function() {
       document.querySelector('paper-toast').opened = true;
     };
-    scope.replaceUrl = function(url) {
-      if (url[0] === '/' || url[0] === '.') {
-        var base = location.protocol + '//' + location.host + '' + location.pathname;
-        if (url[0] === '/' && base[base.length - 1] === '/') {
-          url = url.substr(1);
-        }
-        if (url[0] === '.' && base[base.length - 1] !== '/') {
-          base += '/';
-        }
-        url = base + url;
-      }
+    scope.replaceUrl = function(file) {
+      const url = location.protocol + '//' + location.host +
+        location.pathname.substr(0, location.pathname.lastIndexOf('/')) +
+        '/' + file;
       scope.url = url;
       scope.download();
     };
-    window.addEventListener('WebComponentsReady', function() {
-      document.getElementById('sourceSelector').addEventListener('change', function(e) {
-        var value = e.target.value;
-        if (!value) {
-          return;
-        }
-        scope.replaceUrl(value);
-      });
+    document.getElementById('sourceSelector').addEventListener('change', function(e) {
+      const value = e.target.value;
+      if (!value) {
+        return;
+      }
+      scope.replaceUrl(value);
     });
+  });
   </script>
 </body>
 </html>
