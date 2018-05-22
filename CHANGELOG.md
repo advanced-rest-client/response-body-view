@@ -1,3 +1,17 @@
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/advanced-rest-client/response-body-view/compare/0.1.22...2.0.0) (2018-05-22)
+
+
+### Fix
+
+* Fixing test ([5a98cbf496a355432eabba6e8adf55d73f1afeea](https://github.com/advanced-rest-client/response-body-view/commit/5a98cbf496a355432eabba6e8adf55d73f1afeea))
+
+### Update
+
+* Publishing stable version with Polymer 2 support ([dce92fc73fb9fbfc540241b75fb6a91f2ca723c1](https://github.com/advanced-rest-client/response-body-view/commit/dce92fc73fb9fbfc540241b75fb6a91f2ca723c1))
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/advanced-rest-client/response-body-view/compare/0.1.22...1.0.0) (2018-04-03)
 
