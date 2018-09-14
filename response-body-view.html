@@ -102,8 +102,8 @@ the License.
     </style>
     <template is="dom-if" if="[[hasData]]">
       <div class="content-actions" hidden$="[[contentPreview]]">
-        <paper-icon-button data-action="clipboard-copy" icon="arc:content-copy" on-tap="_copyToClipboard" title="Copy content to clipboard"></paper-icon-button>
-        <paper-icon-button data-action="save-file" icon="arc:archive" on-tap="_saveFile" title="Save content to file"></paper-icon-button>
+        <paper-icon-button data-action="clipboard-copy" icon="arc:content-copy" on-click="_copyToClipboard" title="Copy content to clipboard"></paper-icon-button>
+        <paper-icon-button data-action="save-file" icon="arc:archive" on-click="_saveFile" title="Save content to file"></paper-icon-button>
         <paper-icon-button data-action="raw-toggle" icon="arc:code" toggles active="{{rawView}}" title="Toogle raw response view"></paper-icon-button>
         <template is="dom-if" if="[[_computeRenderPreviewResponse(activeView)]]">
           <paper-icon-button data-action="preview" icon="arc:visibility" toggles active="{{contentPreview}}" title="Preview response"></paper-icon-button>
@@ -117,31 +117,31 @@ the License.
       </div>
     </template>
     <iron-pages selected="{{activeView}}" hidden$="[[contentPreview]]">
-      <response-raw-viewer response-text="[[_raw]]" wrap-text$="[[rawTextWrap]]"></response-raw-viewer>
+      <response-raw-viewer response-text="[[_getRawContent(_raw)]]" wrap-text$="[[rawTextWrap]]"></response-raw-viewer>
       <section>
         <template is="dom-if" if="[[isParsed]]" restamp="true">
-          <response-highlighter response-text="[[_raw]]" content-type="[[contentType]]" is-timeout="{{prismTimeout}}"></response-highlighter>
+          <response-highlighter response-text="[[_getRawContent(_raw)]]" content-type="[[contentType]]" is-timeout="{{prismTimeout}}"></response-highlighter>
         </template>
       </section>
       <section>
         <template is="dom-if" if="[[isJson]]" restamp="true">
-          <json-viewer json="[[_raw]]"></json-viewer>
+          <json-viewer json="[[_getRawContent(_raw)]]"></json-viewer>
         </template>
       </section>
       <section>
         <template is="dom-if" if="[[isXml]]" restamp="true">
-          <xml-viewer xml="[[_raw]]"></xml-viewer>
+          <xml-viewer xml="[[_getRawContent(_raw)]]"></xml-viewer>
         </template>
       </section>
       <section>
         <template is="dom-if" if="[[_computeRenderJsonTable(isJson, jsonTableView)]]" restamp="true">
-          <json-table json="[[_raw]]"></json-table>
+          <json-table json="[[_getRawContent(_raw)]]"></json-table>
         </template>
       </section>
     </iron-pages>
 
     <iframe id="webView" hidden$="[[!contentPreview]]"></iframe>
-    <paper-icon-button class="close-preview" title="Close response preview" icon="arc:close" on-tap="closePreview" hidden$="[[!contentPreview]]"></paper-icon-button>
+    <paper-icon-button class="close-preview" title="Close response preview" icon="arc:close" on-click="closePreview" hidden$="[[!contentPreview]]"></paper-icon-button>
 
     <paper-dialog id="saveDialog" on-iron-overlay-closed="_downloadDialogClose">
       <h2 class="dialog-title">Saving to file</h2>
@@ -150,13 +150,12 @@ the License.
       </div>
       <div class="buttons">
         <paper-button class="button-dismiss" dialog-dismiss>Close</paper-button>
-        <a href$="[[downloadFileUrl]]" autofocus download$="[[downloadFileName]]" on-tap="_downloadIconTap" target="_blank" class="download-link">
+        <a href$="[[downloadFileUrl]]" autofocus download$="[[downloadFileName]]" on-click="_downloadIconTap" target="_blank" class="download-link">
           <paper-button class="button-download">Download file</paper-icon>
         </a>
       </div>
     </paper-dialog>
-
-    <clipboard-copy content="[[_raw]]"></clipboard-copy>
+    <clipboard-copy content="[[_getRawContent(_raw)]]"></clipboard-copy>
     <paper-toast id="safariDownload" text="Safari doesn't support file download. Please, use other browser."></paper-toast>
     <paper-toast id="highlightTimeout"></paper-toast>
 
@@ -199,16 +198,16 @@ the License.
    * `--response-body-view-content-actions` | Mixin applied to the content actions container | `{}`
    * `--response-body-view-dialog-buttons` | Mixin applied to the dialog buttons container | `{}`
    * `--response-body-view-dialog-close` | Mixin applied to dialog's close button | `{}`
-   * `--response-body-view-dialog-close-hover` | Mixin applied to dialog's close button when hovering | `{}`
+   * `--response-body-view-dialog-close-hover` | Mixin for dialog's close button when hovering | `{}`
    * `--response-body-view-dialog-download` | Mixin applies to dialog's download button | `{}`
-   * `--response-body-view-dialog-download-hover` | Mixin applies to dialog's download button when hovering | `{}`
+   * `--response-body-view-dialog-download-hover` | Mixin for dialog's download when hovering | `{}`
    *
    * @polymer
    * @customElement
    * @memberof UiElements
    */
   class ResponseBodyView extends Polymer.Element {
-    static get is() { return 'response-body-view'; }
+    static get is() {return 'response-body-view';}
     static get properties() {
       return {
         /**
@@ -339,6 +338,8 @@ the License.
     /**
      * Handler for `prismTimeout` property change.
      * Displays "raw" view instead of syntax highlighting.
+     *
+     * @param {Boolean} state
      */
     _onPrismHighlightTimeout(state) {
       if (!state) {
@@ -363,10 +364,12 @@ the License.
       this._setIsJson(false);
       this._setIsParsed(false);
       if (payload === undefined) {
-        return this.set('_raw', undefined);
+        this.set('_raw', undefined);
+        return;
       }
       if (payload === null || payload === false) {
-        return this.set('_raw', payload);
+        this.set('_raw', payload);
+        return;
       }
       this.set('_raw', undefined);
       if (!payload) {
@@ -439,12 +442,26 @@ the License.
         this._closeResponsePreview();
       }
     }
+    /**
+     * The component may work in Electron app where Buffer can be returned from
+     * the transport library. This ensures that string is always returned.
+     * @return {String} String value of `_raw` property
+     */
+    _getRawContent() {
+      let raw = this._raw;
+      if (raw instanceof Uint8Array) {
+        raw = raw.toString();
+      }
+      return raw;
+    }
+
     // Opens response preview in new layer
     _openResponsePreview() {
       const context = this;
+      const raw = this._getRawContent();
       function onLoad() {
         try {
-          context.$.webView.contentWindow.document.body.innerHTML = context._raw;
+          context.$.webView.contentWindow.document.body.innerHTML = raw;
         } catch (_) {}
         setTimeout(() => {
           context._resizePreviewWindow(context.$.webView.contentWindow.document.body.clientHeight);
@@ -467,6 +484,8 @@ the License.
     }
     /**
      * Sets height for the preview iframe
+     *
+     * @param {?Number} height
      */
     _resizePreviewWindow(height) {
       if (!height) {
@@ -477,9 +496,11 @@ the License.
     }
     /**
      * Coppies current response text value to clipboard.
+     *
+     * @param {CustomEvent} e
      */
     _copyToClipboard(e) {
-      var button = Polymer.dom(e).localTarget;
+      const button = e.composedPath()[0];
       const copy = this.shadowRoot.querySelector('clipboard-copy');
       if (copy.copy()) {
         button.icon = 'arc:done';
@@ -503,7 +524,7 @@ the License.
         composed: true,
         cancelable: true,
         detail: {
-          data: this._raw,
+          data: this._getRawContent(),
           type: this.contentType,
           file: 'response-data-export'
         }
@@ -528,7 +549,8 @@ the License.
         ext += 'txt';
       }
       const ct = this.contentType || 'text/plain';
-      const file = new Blob([this._raw], {
+      const raw = this._getRawContent();
+      const file = new Blob([raw], {
         type: ct
       });
       const fileName = 'response-' + new Date().toISOString() + ext;
@@ -550,6 +572,8 @@ the License.
     }
     /**
      * Toggles "view source" or raw message view.
+     *
+     * @param {Boolean} opened
      */
     _toggleViewSource(opened) {
       if (!opened) {
@@ -599,6 +623,8 @@ the License.
     /**
      * Updates the value of the `jsonTableView` property when the
      * corresponding localStorage property change.
+     *
+     * @param {StorageEvent} e
      */
     _onStorageChanged(e) {
       if (e.key !== 'jsonTableEnabled') {
@@ -636,7 +662,7 @@ the License.
       if (e.target === this) {
         return;
       }
-      var enabled = e.detail.enabled;
+      const enabled = e.detail.enabled;
       if (enabled !== this.jsonTableView) {
         this._skipJsonTableEvent = true;
         this.jsonTableView = enabled;
@@ -665,6 +691,10 @@ the License.
     }
     /**
      * Computes boolean value whether to render the JSON table element.
+     *
+     * @param {Boolean} isJson
+     * @param {Boolean} jsonTableView
+     * @return {Boolean}
      */
     _computeRenderJsonTable(isJson, jsonTableView) {
       return !!(isJson && jsonTableView);
