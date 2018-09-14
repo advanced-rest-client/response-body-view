@@ -117,25 +117,25 @@ the License.
       </div>
     </template>
     <iron-pages selected="{{activeView}}" hidden$="[[contentPreview]]">
-      <response-raw-viewer response-text="[[_raw]]" wrap-text$="[[rawTextWrap]]"></response-raw-viewer>
+      <response-raw-viewer response-text="[[_getRawContent(_raw)]]" wrap-text$="[[rawTextWrap]]"></response-raw-viewer>
       <section>
         <template is="dom-if" if="[[isParsed]]" restamp="true">
-          <response-highlighter response-text="[[_raw]]" content-type="[[contentType]]" is-timeout="{{prismTimeout}}"></response-highlighter>
+          <response-highlighter response-text="[[_getRawContent(_raw)]]" content-type="[[contentType]]" is-timeout="{{prismTimeout}}"></response-highlighter>
         </template>
       </section>
       <section>
         <template is="dom-if" if="[[isJson]]" restamp="true">
-          <json-viewer json="[[_raw]]"></json-viewer>
+          <json-viewer json="[[_getRawContent(_raw)]]"></json-viewer>
         </template>
       </section>
       <section>
         <template is="dom-if" if="[[isXml]]" restamp="true">
-          <xml-viewer xml="[[_raw]]"></xml-viewer>
+          <xml-viewer xml="[[_getRawContent(_raw)]]"></xml-viewer>
         </template>
       </section>
       <section>
         <template is="dom-if" if="[[_computeRenderJsonTable(isJson, jsonTableView)]]" restamp="true">
-          <json-table json="[[_raw]]"></json-table>
+          <json-table json="[[_getRawContent(_raw)]]"></json-table>
         </template>
       </section>
     </iron-pages>
@@ -155,8 +155,7 @@ the License.
         </a>
       </div>
     </paper-dialog>
-
-    <clipboard-copy content="[[_raw]]"></clipboard-copy>
+    <clipboard-copy content="[[_getRawContent(_raw)]]"></clipboard-copy>
     <paper-toast id="safariDownload" text="Safari doesn't support file download. Please, use other browser."></paper-toast>
     <paper-toast id="highlightTimeout"></paper-toast>
 
@@ -439,12 +438,26 @@ the License.
         this._closeResponsePreview();
       }
     }
+    /**
+     * The component may work in Electron app where Buffer can be returned from
+     * the transport library. This ensures that string is always returned.
+     * @return {String} String value of `_raw` property
+     */
+    _getRawContent() {
+      let raw = this._raw;
+      if (raw instanceof Uint8Array) {
+        raw = raw.toString();
+      }
+      return raw;
+    }
+
     // Opens response preview in new layer
     _openResponsePreview() {
       const context = this;
+      const raw = this._getRawContent();
       function onLoad() {
         try {
-          context.$.webView.contentWindow.document.body.innerHTML = context._raw;
+          context.$.webView.contentWindow.document.body.innerHTML = raw;
         } catch (_) {}
         setTimeout(() => {
           context._resizePreviewWindow(context.$.webView.contentWindow.document.body.clientHeight);
@@ -503,7 +516,7 @@ the License.
         composed: true,
         cancelable: true,
         detail: {
-          data: this._raw,
+          data: this._getRawContent(),
           type: this.contentType,
           file: 'response-data-export'
         }
@@ -528,7 +541,8 @@ the License.
         ext += 'txt';
       }
       const ct = this.contentType || 'text/plain';
-      const file = new Blob([this._raw], {
+      const raw = this._getRawContent();
+      const file = new Blob([raw], {
         type: ct
       });
       const fileName = 'response-' + new Date().toISOString() + ext;
