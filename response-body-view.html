@@ -380,8 +380,8 @@ the License.
       }
       this.__setRawDebouncer = true;
       setTimeout(() => {
-        this.set('_raw', this.responseText);
         this.__setRawDebouncer = false;
+        this.set('_raw', this.responseText);
       }, 1);
     }
 
