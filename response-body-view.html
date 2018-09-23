@@ -452,6 +452,13 @@ the License.
       if (raw instanceof Uint8Array) {
         raw = raw.toString();
       }
+      if (raw && raw.type === 'Buffer') {
+        let str = '';
+        for (let i = 0, len = raw.data.length; i < len; i++) {
+          str += String.fromCharCode(raw.data[i]);
+        }
+        raw = str;
+      }
       return raw;
     }
 
