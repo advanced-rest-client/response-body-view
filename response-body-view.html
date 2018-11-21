@@ -45,6 +45,18 @@ the License.
       min-width: 320px;
     }
 
+    paper-icon-button {
+      transition: color 0.25s ease-in-out;
+    }
+
+    paper-icon-button[toggles] {
+      color: var(--content-action-button-color, rgba(0, 0, 0, 0.74));
+    }
+
+    paper-icon-button:hover {
+      color: var(--content-action-button-color-hover, var(--accent-color, rgba(0, 0, 0, 0.74)));
+    }
+
     paper-icon-button[active] {
       background-color: var(--response-raw-viewer-button-active, #BDBDBD);
       border-radius: 50%;
@@ -151,7 +163,7 @@ the License.
       <div class="buttons">
         <paper-button class="button-dismiss" dialog-dismiss>Close</paper-button>
         <a href$="[[downloadFileUrl]]" autofocus download$="[[downloadFileName]]" on-click="_downloadIconTap" target="_blank" class="download-link">
-          <paper-button class="button-download">Download file</paper-icon>
+          <paper-button class="button-download">Download file</paper-button>
         </a>
       </div>
     </paper-dialog>
@@ -531,6 +543,7 @@ the License.
         composed: true,
         cancelable: true,
         detail: {
+          destination: 'file',
           data: this._getRawContent(),
           type: this.contentType,
           file: 'response-data-export'

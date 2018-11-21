@@ -1,3 +1,28 @@
+<a name="2.0.4"></a>
+## [2.0.4](https://github.com/advanced-rest-client/response-body-view/compare/0.1.22...2.0.4) (2018-11-21)
+
+
+### Docs
+
+* Updating documentation ([9aa0eb3f9ad0c65b819f54ed3d19f8b56db61617](https://github.com/advanced-rest-client/response-body-view/commit/9aa0eb3f9ad0c65b819f54ed3d19f8b56db61617))
+
+### Fix
+
+* Fixing linter errors ([d404fde8a271816e950376d67dd15947d8fbfcb7](https://github.com/advanced-rest-client/response-body-view/commit/d404fde8a271816e950376d67dd15947d8fbfcb7))
+* Fixing test ([5a98cbf496a355432eabba6e8adf55d73f1afeea](https://github.com/advanced-rest-client/response-body-view/commit/5a98cbf496a355432eabba6e8adf55d73f1afeea))
+
+### new
+
+* Adding support for Buffer payload type ([aa8e7dc93211e539b9432ecf2a07fd4dd11bb9a1](https://github.com/advanced-rest-client/response-body-view/commit/aa8e7dc93211e539b9432ecf2a07fd4dd11bb9a1))
+
+### Update
+
+* Adding `destination` property to export event ([db2586233d7b924099ba5bbf8b2853f365fc0a05](https://github.com/advanced-rest-client/response-body-view/commit/db2586233d7b924099ba5bbf8b2853f365fc0a05))
+* Publishing stable version with Polymer 2 support ([dce92fc73fb9fbfc540241b75fb6a91f2ca723c1](https://github.com/advanced-rest-client/response-body-view/commit/dce92fc73fb9fbfc540241b75fb6a91f2ca723c1))
+* Updating styling API for icons ([e9f2eb0c87d9d21790cda135cd9ab4dfd80554d1](https://github.com/advanced-rest-client/response-body-view/commit/e9f2eb0c87d9d21790cda135cd9ab4dfd80554d1))
+
+
+
 <a name="2.0.3"></a>
 ## [2.0.3](https://github.com/advanced-rest-client/response-body-view/compare/0.1.22...2.0.3) (2018-09-23)
 
