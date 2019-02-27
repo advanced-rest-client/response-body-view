@@ -5,22 +5,16 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   response-body-view.html
+ *   response-body-view.js
  */
 
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../polymer/types/lib/elements/dom-if.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../iron-pages/iron-pages.d.ts" />
-/// <reference path="../response-raw-viewer/response-raw-viewer.d.ts" />
-/// <reference path="../xml-viewer/xml-viewer.d.ts" />
-/// <reference path="../json-viewer/json-viewer.d.ts" />
-/// <reference path="../response-highlighter/response-highlighter.d.ts" />
-/// <reference path="../clipboard-copy/clipboard-copy.d.ts" />
-/// <reference path="../paper-dialog/paper-dialog.d.ts" />
-/// <reference path="../paper-icon-button/paper-icon-button.d.ts" />
-/// <reference path="../paper-toast/paper-toast.d.ts" />
-/// <reference path="../json-table/json-table.d.ts" />
+
+// tslint:disable:variable-name Describing an API that's defined elsewhere.
+// tslint:disable:no-any describes the API as best we are able today
+
+import {PolymerElement} from '@polymer/polymer/polymer-element.js';
+
+import {html} from '@polymer/polymer/lib/utils/html-tag.js';
 
 declare namespace UiElements {
 
@@ -60,7 +54,7 @@ declare namespace UiElements {
    * `--response-body-view-dialog-download` | Mixin applies to dialog's download button | `{}`
    * `--response-body-view-dialog-download-hover` | Mixin for dialog's download when hovering | `{}`
    */
-  class ResponseBodyView extends Polymer.Element {
+  class ResponseBodyView extends PolymerElement {
 
     /**
      * Raw response as a response text.
@@ -265,6 +259,9 @@ declare namespace UiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "response-body-view": UiElements.ResponseBodyView;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "response-body-view": UiElements.ResponseBodyView;
+  }
 }

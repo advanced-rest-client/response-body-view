@@ -3,11 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
-    <link rel="import" href="../response-body-view.html">
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+
   </head>
   <body>
 
@@ -17,8 +19,9 @@
       </template>
     </test-fixture>
 
-    <script>
-    /* global MockInteractions */
+    <script type="module">
+    import '../response-body-view.js';
+    import {tap} from '@polymer/iron-test-helpers/mock-interactions.js';
     suite('Content actions', () => {
       let element;
 
@@ -70,7 +73,7 @@
             done();
           });
           const button = element.shadowRoot.querySelector('paper-icon-button[data-action="clipboard-copy"]');
-          MockInteractions.tap(button);
+          tap(button);
         });
 
         test('Clipboard copy icon changes', () => {
@@ -78,7 +81,7 @@
             e.preventDefault();
           });
           const button = element.shadowRoot.querySelector('paper-icon-button[data-action="clipboard-copy"]');
-          MockInteractions.tap(button);
+          tap(button);
           assert.equal(button.icon, 'arc:done');
         });
 
@@ -87,7 +90,7 @@
             e.preventDefault();
           });
           const button = element.shadowRoot.querySelector('paper-icon-button[data-action="clipboard-copy"]');
-          MockInteractions.tap(button);
+          tap(button);
           setTimeout(() => {
             assert.equal(button.icon, 'arc:content-copy');
             done();
@@ -107,7 +110,7 @@
 
         test('Sets file content URL', () => {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           assert.isString(element.downloadFileUrl);
           assert.isString(element.downloadFileName);
         });
@@ -120,7 +123,7 @@
             done();
           });
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
         });
 
         test('Canceled export-data event does not display save dialog', function(done) {
@@ -128,7 +131,7 @@
             e.preventDefault();
           });
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           setTimeout(() => {
             const dialog = element.shadowRoot.querySelector('#saveDialog');
             assert.isFalse(dialog.opened);
@@ -138,7 +141,7 @@
 
         test('Not canceled export-data event displays save dialog', function(done) {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           setTimeout(() => {
             const dialog = element.shadowRoot.querySelector('#saveDialog');
             assert.isTrue(dialog.opened);
@@ -161,19 +164,19 @@
 
         test('Changes activeView to 0', () => {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           assert.equal(element.activeView, 0);
         });
 
         test('Sets __parsedView to previouslt selected view', () => {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           assert.equal(element.__parsedView, 1);
         });
 
         test('response-raw-viewer is visible', () => {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           const panel = element.shadowRoot.querySelector('response-raw-viewer');
           const display = getComputedStyle(panel).display;
           assert.notEqual(display, 'none');
@@ -181,16 +184,16 @@
 
         test('Changes activeView to previously enabled view', () => {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           assert.equal(element.activeView, 0);
-          MockInteractions.tap(button);
+          tap(button);
           assert.equal(element.activeView, 1);
         });
 
         test('response-raw-viewer is hidden when disabled', () => {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
-          MockInteractions.tap(button);
+          tap(button);
+          tap(button);
           const panel = element.shadowRoot.querySelector('response-raw-viewer');
           const display = getComputedStyle(panel).display;
           assert.equal(display, 'none');
@@ -198,8 +201,8 @@
 
         test('__parsedView is unset when disabled', () => {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
-          MockInteractions.tap(button);
+          tap(button);
+          tap(button);
           assert.isUndefined(element.__parsedView);
         });
       });
@@ -225,7 +228,7 @@
             setTimeout(() => done(), 5);
           });
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           assert.isTrue(element.contentPreview);
         });
 
@@ -301,7 +304,7 @@
 
         test('Sets activeView to 4', () => {
           const button = element.shadowRoot.querySelector(selector);
-          MockInteractions.tap(button);
+          tap(button);
           assert.equal(element.activeView, 4);
         });
 

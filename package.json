@@ -1,29 +1,64 @@
 {
-  "name": "@advanced-rest-client/response-body-view",
   "description": "An element to display the response body",
-  "version": "2.0.4",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "response",
+    "body",
+    "viewer"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/advanced-rest-client/response-body-view.git"
+  },
+  "name": "@advanced-rest-client/response-body-view",
+  "version": "3.0.0-preview.1",
   "license": "Apache-2.0",
   "authors": [
     "Pawel Psztyc",
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
   "devDependencies": {
-    "@polymer/gen-typescript-declarations": "^1.5.1"
+    "@polymer/gen-typescript-declarations": "^1.5.1",
+    "@polymer/iron-demo-helpers": "^3.0.0",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/iron-test-helpers": "^3.0.0",
+    "@polymer/iron-component-page": "^4.0.0",
+    "@polymer/paper-button": "^3.0.0",
+    "@polymer/paper-input": "^3.0.0",
+    "@polymer/test-fixture": "^4.0.2",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "sinon": "^7.2.3",
+    "wct-mocha": "^1.0.0"
   },
-  "private": false,
-  "main": "response-body-view.html",
+  "main": "response-body-view.js",
   "scripts": {
     "lint": "polymer lint response-body-view.html",
     "test-sauce": "polymer test --plugin sauce --job-name \"response-body-view:local-test\"",
     "test": "polymer test --plugin local",
     "update-types": "gen-typescript-declarations --deleteExisting --outDir ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/advanced-rest-client/response-body-view.git"
-  },
   "bugs": {
     "url": "https://github.com/advanced-rest-client/response-body-view/issues",
     "email": "arc@mulesoft.com"
+  },
+  "contributors": [
+    "Pawel Psztyc",
+    "The Advanced REST client authors <arc@mulesoft.com>"
+  ],
+  "dependencies": {
+    "@advanced-rest-client/arc-icons": "^3.0.0-preview.1",
+    "@advanced-rest-client/json-table": "^3.0.0-preview.1",
+    "@advanced-rest-client/json-viewer": "^3.0.0-preview",
+    "@advanced-rest-client/response-highlighter": "^3.0.0-preview.1",
+    "@advanced-rest-client/response-raw-viewer": "^3.0.0-preview.1",
+    "@advanced-rest-client/xml-viewer": "^3.0.0-preview.1",
+    "@api-components/clipboard-copy": "^3.0.0-preview.1",
+    "@polymer/iron-pages": "^3.0.0",
+    "@polymer/paper-dialog": "^3.0.0",
+    "@polymer/paper-icon-button": "^3.0.0",
+    "@polymer/paper-toast": "^3.0.0",
+    "@polymer/polymer": "^3.0.0"
   }
 }
