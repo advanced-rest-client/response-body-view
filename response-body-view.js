@@ -312,6 +312,22 @@ class ResponseBodyView extends PolymerElement {
       prismTimeout: {
         type: Boolean,
         observer: '_onPrismHighlightTimeout'
+      },
+      /**
+       * True if current environment has localStorage suppport.
+       * Chrome apps do not have localStorage property.
+       */
+      hasLocalStorage: {
+        type: Boolean,
+        readOnly: true,
+        value: function() {
+          try {
+            localStorage.getItem('test');
+            return true;
+          } catch (_) {
+            return false;
+          }
+        }
       }
     };
   }
@@ -435,6 +451,9 @@ class ResponseBodyView extends PolymerElement {
    * (if it is turned on) and handles view change if needed.
    */
   _ensureJsonTable() {
+    if (!this.hasLocalStorage) {
+      return;
+    }
     const isTable = this._localStorageValueToBoolean(localStorage.jsonTableEnabled);
     if (this.jsonTableView !== isTable) {
       this.jsonTableView = isTable;
@@ -638,8 +657,10 @@ class ResponseBodyView extends PolymerElement {
     if (this._skipJsonTableEvent) {
       return;
     }
-    if (localStorage.jsonTableEnabled !== String(state)) {
-      window.localStorage.setItem('jsonTableEnabled', state);
+    if (this.hasLocalStorage) {
+      if (localStorage.jsonTableEnabled !== String(state)) {
+        window.localStorage.setItem('jsonTableEnabled', state);
+      }
     }
     this.dispatchEvent(new CustomEvent('json-table-state-changed', {
       detail: {
