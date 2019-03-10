@@ -934,6 +934,28 @@
               "attributeType": "Boolean"
             }
           }
+        },
+        {
+          "name": "hasLocalStorage",
+          "type": "boolean | null | undefined",
+          "description": "True if current environment has localStorage suppport.\nChrome apps do not have localStorage property.",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 320,
+              "column": 8
+            },
+            "end": {
+              "line": 331,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true,
+              "attributeType": "Boolean"
+            }
+          }
         }
       ],
       "methods": [
@@ -3024,11 +3046,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 333,
+              "line": 349,
               "column": 4
             },
             "end": {
-              "line": 337,
+              "line": 353,
               "column": 5
             }
           },
@@ -3044,11 +3066,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 339,
+              "line": 355,
               "column": 4
             },
             "end": {
-              "line": 347,
+              "line": 363,
               "column": 5
             }
           },
@@ -3155,11 +3177,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 355,
+              "line": 371,
               "column": 4
             },
             "end": {
-              "line": 365,
+              "line": 381,
               "column": 5
             }
           },
@@ -3180,11 +3202,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 373,
+              "line": 389,
               "column": 4
             },
             "end": {
-              "line": 397,
+              "line": 413,
               "column": 5
             }
           },
@@ -3205,11 +3227,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 400,
+              "line": 416,
               "column": 4
             },
             "end": {
-              "line": 402,
+              "line": 418,
               "column": 5
             }
           },
@@ -3229,11 +3251,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 408,
+              "line": 424,
               "column": 4
             },
             "end": {
-              "line": 431,
+              "line": 447,
               "column": 5
             }
           },
@@ -3255,11 +3277,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 437,
+              "line": 453,
               "column": 4
             },
             "end": {
-              "line": 447,
+              "line": 466,
               "column": 5
             }
           },
@@ -3275,11 +3297,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 449,
+              "line": 468,
               "column": 4
             },
             "end": {
-              "line": 455,
+              "line": 474,
               "column": 5
             }
           },
@@ -3299,11 +3321,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 461,
+              "line": 480,
               "column": 4
             },
             "end": {
-              "line": 484,
+              "line": 503,
               "column": 5
             }
           },
@@ -3320,11 +3342,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 487,
+              "line": 506,
               "column": 4
             },
             "end": {
-              "line": 506,
+              "line": 525,
               "column": 5
             }
           },
@@ -3340,11 +3362,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 508,
+              "line": 527,
               "column": 4
             },
             "end": {
-              "line": 512,
+              "line": 531,
               "column": 5
             }
           },
@@ -3360,11 +3382,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 518,
+              "line": 537,
               "column": 4
             },
             "end": {
-              "line": 524,
+              "line": 543,
               "column": 5
             }
           },
@@ -3385,11 +3407,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 530,
+              "line": 549,
               "column": 4
             },
             "end": {
-              "line": 539,
+              "line": 558,
               "column": 5
             }
           },
@@ -3410,11 +3432,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 541,
+              "line": 560,
               "column": 4
             },
             "end": {
-              "line": 543,
+              "line": 562,
               "column": 5
             }
           },
@@ -3434,11 +3456,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 549,
+              "line": 568,
               "column": 4
             },
             "end": {
-              "line": 566,
+              "line": 585,
               "column": 5
             }
           },
@@ -3454,11 +3476,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 571,
+              "line": 590,
               "column": 4
             },
             "end": {
-              "line": 589,
+              "line": 608,
               "column": 5
             }
           },
@@ -3474,11 +3496,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 591,
+              "line": 610,
               "column": 4
             },
             "end": {
-              "line": 595,
+              "line": 614,
               "column": 5
             }
           },
@@ -3494,11 +3516,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 597,
+              "line": 616,
               "column": 4
             },
             "end": {
-              "line": 601,
+              "line": 620,
               "column": 5
             }
           },
@@ -3514,11 +3536,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 607,
+              "line": 626,
               "column": 4
             },
             "end": {
-              "line": 626,
+              "line": 645,
               "column": 5
             }
           },
@@ -3539,11 +3561,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 628,
+              "line": 647,
               "column": 4
             },
             "end": {
-              "line": 651,
+              "line": 672,
               "column": 5
             }
           },
@@ -3563,11 +3585,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 658,
+              "line": 679,
               "column": 4
             },
             "end": {
-              "line": 671,
+              "line": 692,
               "column": 5
             }
           },
@@ -3588,11 +3610,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 678,
+              "line": 699,
               "column": 4
             },
             "end": {
-              "line": 688,
+              "line": 709,
               "column": 5
             }
           },
@@ -3615,11 +3637,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 690,
+              "line": 711,
               "column": 4
             },
             "end": {
-              "line": 700,
+              "line": 721,
               "column": 5
             }
           },
@@ -3639,11 +3661,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 702,
+              "line": 723,
               "column": 4
             },
             "end": {
-              "line": 704,
+              "line": 725,
               "column": 5
             }
           },
@@ -3659,11 +3681,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 706,
+              "line": 727,
               "column": 4
             },
             "end": {
-              "line": 708,
+              "line": 729,
               "column": 5
             }
           },
@@ -3680,11 +3702,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 710,
+              "line": 731,
               "column": 4
             },
             "end": {
-              "line": 712,
+              "line": 733,
               "column": 5
             }
           },
@@ -3701,11 +3723,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 714,
+              "line": 735,
               "column": 4
             },
             "end": {
-              "line": 716,
+              "line": 737,
               "column": 5
             }
           },
@@ -3722,11 +3744,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 718,
+              "line": 739,
               "column": 4
             },
             "end": {
-              "line": 720,
+              "line": 741,
               "column": 5
             }
           },
@@ -3743,11 +3765,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 728,
+              "line": 749,
               "column": 4
             },
             "end": {
-              "line": 730,
+              "line": 751,
               "column": 5
             }
           },
@@ -4732,7 +4754,7 @@
           "column": 2
         },
         "end": {
-          "line": 751,
+          "line": 772,
           "column": 3
         }
       },
@@ -4958,6 +4980,22 @@
             },
             "end": {
               "line": 315,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "has-local-storage",
+          "description": "True if current environment has localStorage suppport.\nChrome apps do not have localStorage property.",
+          "sourceRange": {
+            "start": {
+              "line": 320,
+              "column": 8
+            },
+            "end": {
+              "line": 331,
               "column": 9
             }
           },
