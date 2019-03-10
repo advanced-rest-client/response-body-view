@@ -132,6 +132,12 @@ declare namespace UiElements {
      */
     readonly hasData: boolean|null|undefined;
     prismTimeout: boolean|null|undefined;
+
+    /**
+     * True if current environment has localStorage suppport.
+     * Chrome apps do not have localStorage property.
+     */
+    readonly hasLocalStorage: boolean|null|undefined;
     connectedCallback(): void;
     disconnectedCallback(): void;
 
