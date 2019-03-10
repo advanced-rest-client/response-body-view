@@ -461,7 +461,17 @@ class ResponseBodyView extends PolymerElement {
   _getRawContent() {
     let raw = this._raw;
     if (raw instanceof Uint8Array) {
-      raw = raw.toString();
+      if (raw.buffer) {
+        // plain JS Uint8Array
+        let str = '';
+        for (let i = 0, len = raw.length; i < len; i++) {
+          str += String.fromCharCode(raw[i]);
+        }
+        raw = str;
+      } else {
+        // NodeJS buffer
+        raw = raw.toString();
+      }
     }
     if (raw && raw.type === 'Buffer') {
       let str = '';
