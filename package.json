@@ -12,7 +12,7 @@
     "url": "git://github.com/advanced-rest-client/response-body-view.git"
   },
   "name": "@advanced-rest-client/response-body-view",
-  "version": "3.0.0-preview.3",
+  "version": "3.0.0-preview.4",
   "license": "Apache-2.0",
   "authors": [
     "Pawel Psztyc",
@@ -50,7 +50,7 @@
   "dependencies": {
     "@advanced-rest-client/arc-icons": "^3.0.0-preview.1",
     "@advanced-rest-client/json-table": "^3.0.0-preview.1",
-    "@advanced-rest-client/json-viewer": "^3.0.0-preview",
+    "@advanced-rest-client/json-viewer": "^3.0.0-preview.1",
     "@advanced-rest-client/response-highlighter": "^3.0.0-preview.1",
     "@advanced-rest-client/response-raw-viewer": "^3.0.0-preview.1",
     "@advanced-rest-client/xml-viewer": "^3.0.0-preview.1",
