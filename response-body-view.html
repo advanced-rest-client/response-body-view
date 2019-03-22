@@ -27,7 +27,7 @@ the License.
 <dom-module id="response-body-view">
   <template strip-whitespace>
     <style>
-    :host {
+      :host {
       display: block;
       position: relative;
       @apply --response-body-view;
@@ -151,10 +151,8 @@ the License.
         </template>
       </section>
     </iron-pages>
-
     <iframe id="webView" hidden$="[[!contentPreview]]"></iframe>
     <paper-icon-button class="close-preview" title="Close response preview" icon="arc:close" on-click="closePreview" hidden$="[[!contentPreview]]"></paper-icon-button>
-
     <paper-dialog id="saveDialog" on-iron-overlay-closed="_downloadDialogClose">
       <h2 class="dialog-title">Saving to file</h2>
       <div>
@@ -170,7 +168,6 @@ the License.
     <clipboard-copy content="[[_getRawContent(_raw)]]"></clipboard-copy>
     <paper-toast id="safariDownload" text="Safari doesn't support file download. Please, use other browser."></paper-toast>
     <paper-toast id="highlightTimeout"></paper-toast>
-
     <script id="preview" type="text/html">
       <!DOCTYPE html><html><head><title>Advanced REST client - preview</title><style>
         body,html{overflow:auto;margin:0;padding:0}body{margin:16px;min-height:200px}
@@ -219,7 +216,9 @@ the License.
    * @memberof UiElements
    */
   class ResponseBodyView extends Polymer.Element {
-    static get is() {return 'response-body-view';}
+    static get is() {
+      return 'response-body-view';
+    }
     static get properties() {
       return {
         /**
@@ -235,6 +234,11 @@ the License.
          * The response content type.
          */
         contentType: String,
+        /**
+         * Current value of charset encoding, if available.
+         * It should be set to correctly decode buffer to string
+         */
+        charset: String,
         /**
          * If true then the conent preview will be visible instead of the code view
          */
@@ -480,29 +484,42 @@ the License.
      */
     _getRawContent() {
       let raw = this._raw;
-      if (raw instanceof Uint8Array) {
-        if (raw.buffer) {
-          // plain JS Uint8Array
-          let str = '';
-          for (let i = 0, len = raw.length; i < len; i++) {
-            str += String.fromCharCode(raw[i]);
-          }
-          raw = str;
-        } else {
-          // NodeJS buffer
-          raw = raw.toString();
-        }
+      if (!raw || typeof raw === 'string') {
+        return raw;
       }
       if (raw && raw.type === 'Buffer') {
-        let str = '';
-        for (let i = 0, len = raw.data.length; i < len; i++) {
-          str += String.fromCharCode(raw.data[i]);
-        }
-        raw = str;
+        raw = new Uint16Array(raw.data);
       }
-      return raw;
+      const ce = this._getEncoding();
+      const decoder = new TextDecoder(ce);
+      return decoder.decode(raw);
     }
-
+    /**
+     * Finds correct charset ecoding for the response.
+     * By default it always returns `utf-8` unelss charset encoding is provided
+     * in the content type header.
+     * @return {String} Character set encoding.
+     */
+    _getEncoding() {
+      const ct = this.charset;
+      let enc = 'utf-8';
+      if (!ct || !ct.split) {
+        return enc;
+      }
+      if (ct.indexOf('charset') === -1) {
+        return enc;
+      }
+      const parts = ct.split(';');
+      for (let i = 0, len = parts.length; i < len; i++) {
+        let part = parts[i].trim();
+        const _tmp = part.split('=');
+        if (_tmp[0] === 'charset') {
+          enc = _tmp[1].trim();
+          break;
+        }
+      }
+      return enc;
+    }
     // Opens response preview in new layer
     _openResponsePreview() {
       const context = this;
@@ -516,7 +533,9 @@ the License.
         }, 2);
       }
       if (!this.$.webView.src) {
-        const blob = new Blob([this.$.preview.textContent], {type: 'text/html'});
+        const blob = new Blob([this.$.preview.textContent], {
+          type: 'text/html'
+        });
         this.__previewUrl = window.URL.createObjectURL(blob);
         this.$.webView.src = this.__previewUrl;
         this.$.webView.addEventListener('load', () => onLoad());
