@@ -326,6 +326,12 @@ class ResponseBodyView extends PolymerElement {
         type: Boolean,
         readOnly: true,
         value: function() {
+          /* global chrome */
+          if (typeof chrome !== 'undefined' && chrome.i18n) {
+            // Chrome apps have `chrome.i18n` property, regular website doesn't.
+            // This is to avoid annoying warning message in Chrome apps.
+            return false;
+          }
           try {
             localStorage.getItem('test');
             return true;
