@@ -82,6 +82,12 @@ declare namespace UiElements {
     contentType: string|null|undefined;
 
     /**
+     * Current value of charset encoding, if available.
+     * It should be set to correctly decode buffer to string
+     */
+    charset: string|null|undefined;
+
+    /**
      * If true then the conent preview will be visible instead of the code view
      */
     contentPreview: boolean|null|undefined;
@@ -194,6 +200,15 @@ declare namespace UiElements {
      * @returns String value of `_raw` property
      */
     _getRawContent(): String|null;
+
+    /**
+     * Finds correct charset ecoding for the response.
+     * By default it always returns `utf-8` unelss charset encoding is provided
+     * in the content type header.
+     *
+     * @returns Character set encoding.
+     */
+    _getEncoding(): String|null;
 
     /**
      * Opens response preview in new layer
