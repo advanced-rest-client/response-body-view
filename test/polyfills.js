@@ -65,7 +65,7 @@ if (typeof TextEncoder === "undefined") {
  */
 (function(global) {
   'use strict';
-  if (typeof TextEncoder !== "undefined") {
+  if (typeof TextDecoder !== "undefined") {
     return;
   }
   // If we're in node require encoding-indexes and attach it to the global.
