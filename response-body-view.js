@@ -11,20 +11,20 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import {PolymerElement} from '@polymer/polymer/polymer-element.js';
-import {html} from '@polymer/polymer/lib/utils/html-tag.js';
-import '@polymer/polymer/lib/elements/dom-if.js';
-import '@advanced-rest-client/arc-icons/arc-icons.js';
-import '@polymer/iron-pages/iron-pages.js';
-import '@advanced-rest-client/response-raw-viewer/response-raw-viewer.js';
-import '@advanced-rest-client/xml-viewer/xml-viewer.js';
-import '@advanced-rest-client/json-viewer/json-viewer.js';
-import '@advanced-rest-client/response-highlighter/response-highlighter.js';
-import '@api-components/clipboard-copy/clipboard-copy.js';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-icon-button/paper-icon-button.js';
-import '@polymer/paper-toast/paper-toast.js';
-import '@advanced-rest-client/json-table/json-table.js';
+import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
+import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
+import '../../@polymer/polymer/lib/elements/dom-if.js';
+import '../../@advanced-rest-client/arc-icons/arc-icons.js';
+import '../../@polymer/iron-pages/iron-pages.js';
+import '../../@advanced-rest-client/response-raw-viewer/response-raw-viewer.js';
+import '../../@advanced-rest-client/xml-viewer/xml-viewer.js';
+import '../../@advanced-rest-client/json-viewer/json-viewer.js';
+import '../../@advanced-rest-client/response-highlighter/response-highlighter.js';
+import '../../@api-components/clipboard-copy/clipboard-copy.js';
+import '../../@polymer/paper-dialog/paper-dialog.js';
+import '../../@polymer/paper-icon-button/paper-icon-button.js';
+import '../../@polymer/paper-toast/paper-toast.js';
+import '../../@advanced-rest-client/json-table/json-table.js';
 /* eslint-disable max-len */
 /**
  * An element to display a HTTP response body.
