@@ -68,7 +68,7 @@ import '@advanced-rest-client/json-table/json-table.js';
  */
 class ResponseBodyView extends PolymerElement {
   static get template() {
-    return html`<style>
+    return html `<style>
     :host {
       display: block;
       position: relative;
@@ -234,6 +234,11 @@ class ResponseBodyView extends PolymerElement {
        * The response content type.
        */
       contentType: String,
+      /**
+       * Current value of charset encoding, if available.
+       * It should be set to correctly decode buffer to string
+       */
+      charset: String,
       /**
        * If true then the conent preview will be visible instead of the code view
        */
@@ -479,33 +484,21 @@ class ResponseBodyView extends PolymerElement {
    */
   _getRawContent() {
     let raw = this._raw;
-    if (raw instanceof Uint8Array) {
-      if (raw.buffer) {
-        // plain JS Uint8Array
-        let str = '';
-        for (let i = 0, len = raw.length; i < len; i++) {
-          str += String.fromCharCode(raw[i]);
-        }
-        raw = str;
-      } else {
-        // NodeJS buffer
-        raw = raw.toString();
-      }
+    if (!raw || typeof raw === 'string') {
+      return raw;
     }
     if (raw && raw.type === 'Buffer') {
-      let str = '';
-      for (let i = 0, len = raw.data.length; i < len; i++) {
-        str += String.fromCharCode(raw.data[i]);
-      }
-      raw = str;
+      raw = new Uint16Array(raw.data);
     }
-    return raw;
+    const ce = this.charset || 'utf-8';
+    const decoder = new TextDecoder(ce);
+    return decoder.decode(raw);
   }
-
   // Opens response preview in new layer
   _openResponsePreview() {
     const context = this;
     const raw = this._getRawContent();
+
     function onLoad() {
       try {
         context.$.webView.contentWindow.document.body.innerHTML = raw;
@@ -515,7 +508,9 @@ class ResponseBodyView extends PolymerElement {
       }, 2);
     }
     if (!this.$.webView.src) {
-      const blob = new Blob([this.$.preview.textContent], {type: 'text/html'});
+      const blob = new Blob([this.$.preview.textContent], {
+        type: 'text/html'
+      });
       this.__previewUrl = window.URL.createObjectURL(blob);
       this.$.webView.src = this.__previewUrl;
       this.$.webView.addEventListener('load', () => onLoad());

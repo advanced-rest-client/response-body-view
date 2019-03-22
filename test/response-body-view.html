@@ -10,6 +10,7 @@
     <script src="../node_modules/chai/chai.js"></script>
     <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
 
+    <script src="polyfills.js"></script>
   </head>
   <body>
 
@@ -109,6 +110,44 @@
           assert.isUndefined(element.__parsedView, '__parsedView is undefined');
           done();
         });
+      });
+    });
+
+    suite('_getRawContent()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns undefined when no _raw property', () => {
+        const result = element._getRawContent();
+        assert.isUndefined(result);
+      });
+
+      test('Returns string value when _raw is string', () => {
+        const value = 'test-value';
+        element._raw = value;
+        const result = element._getRawContent();
+        assert.equal(result, value);
+      });
+
+      test('Returns string for Uint8Array', () => {
+        const string = 'test encoded value';
+        const textEncoder = new TextEncoder();
+        element._raw = textEncoder.encode(string);
+        const result = element._getRawContent();
+        assert.equal(result, string);
+      });
+
+      test('Returns string for meta data (ArrayBuffer)', () => {
+        const string = 'test encoded value';
+        const textEncoder = new TextEncoder();
+        element._raw = {
+          data: textEncoder.encode(string).buffer,
+          type: 'Buffer'
+        };
+        const result = element._getRawContent();
+        assert.equal(result, string);
       });
     });
     </script>
