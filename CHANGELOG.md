@@ -395,3 +395,36 @@
 
 
 
+## [2.0.7](https://github.com/advanced-rest-client/response-body-view/compare/0.1.22...2.0.7) (2019-03-22)
+
+
+### Docs
+
+* Updating documentation ([9aa0eb3f9ad0c65b819f54ed3d19f8b56db61617](https://github.com/advanced-rest-client/response-body-view/commit/9aa0eb3f9ad0c65b819f54ed3d19f8b56db61617))
+* Updating Polymer docs and typpings ([368961c95bf041b81510df7682d7f6f4610be18e](https://github.com/advanced-rest-client/response-body-view/commit/368961c95bf041b81510df7682d7f6f4610be18e))
+* Updating Polymer dosc and typpings ([125b199985e41c2974efcb097833747ff187ae82](https://github.com/advanced-rest-client/response-body-view/commit/125b199985e41c2974efcb097833747ff187ae82))
+* Updating typpings and Polymer docs ([7617d39eefafcee75ca97823a44df7c9ddc94d90](https://github.com/advanced-rest-client/response-body-view/commit/7617d39eefafcee75ca97823a44df7c9ddc94d90))
+
+### Fix
+
+* Fixing issues with buffer rendering. ([0eab829f908d4e29b9fb0962b19d4a2800c2ce9e](https://github.com/advanced-rest-client/response-body-view/commit/0eab829f908d4e29b9fb0962b19d4a2800c2ce9e))
+* Fixing linter errors ([d404fde8a271816e950376d67dd15947d8fbfcb7](https://github.com/advanced-rest-client/response-body-view/commit/d404fde8a271816e950376d67dd15947d8fbfcb7))
+* Fixing plain JS Uint8Array render ([affbb83be14656a18cfb98eb70f770643cb382dc](https://github.com/advanced-rest-client/response-body-view/commit/affbb83be14656a18cfb98eb70f770643cb382dc))
+* Fixing polyfill file ([e739a92227a4d12d6f2578c46d5bb81efac8dc95](https://github.com/advanced-rest-client/response-body-view/commit/e739a92227a4d12d6f2578c46d5bb81efac8dc95))
+* Fixing test ([5a98cbf496a355432eabba6e8adf55d73f1afeea](https://github.com/advanced-rest-client/response-body-view/commit/5a98cbf496a355432eabba6e8adf55d73f1afeea))
+
+### new
+
+* Adding support for Buffer payload type ([aa8e7dc93211e539b9432ecf2a07fd4dd11bb9a1](https://github.com/advanced-rest-client/response-body-view/commit/aa8e7dc93211e539b9432ecf2a07fd4dd11bb9a1))
+
+### Update
+
+* Adding `destination` property to export event ([db2586233d7b924099ba5bbf8b2853f365fc0a05](https://github.com/advanced-rest-client/response-body-view/commit/db2586233d7b924099ba5bbf8b2853f365fc0a05))
+* Adding type check for localStorage access ([b209d4414b25c84ca09ea0d94200ea7ced09fe5f](https://github.com/advanced-rest-client/response-body-view/commit/b209d4414b25c84ca09ea0d94200ea7ced09fe5f))
+* Improving chrome apps local storage access test ([c757ecd371ad3c0f092fcbb872ecad3fcc7947a1](https://github.com/advanced-rest-client/response-body-view/commit/c757ecd371ad3c0f092fcbb872ecad3fcc7947a1))
+* Publishing stable version with Polymer 2 support ([dce92fc73fb9fbfc540241b75fb6a91f2ca723c1](https://github.com/advanced-rest-client/response-body-view/commit/dce92fc73fb9fbfc540241b75fb6a91f2ca723c1))
+* Updating styling API for icons ([e9f2eb0c87d9d21790cda135cd9ab4dfd80554d1](https://github.com/advanced-rest-client/response-body-view/commit/e9f2eb0c87d9d21790cda135cd9ab4dfd80554d1))
+* Updating tests for decoding raw values ([68706bec677d12017ec74e800d770b406acd6e7b](https://github.com/advanced-rest-client/response-body-view/commit/68706bec677d12017ec74e800d770b406acd6e7b))
+
+
+
