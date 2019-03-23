@@ -66,7 +66,7 @@ import '../../@advanced-rest-client/json-table/json-table.js';
  * @customElement
  * @memberof UiElements
  */
-class ResponseBodyView extends PolymerElement {
+export class ResponseBodyView extends PolymerElement {
   static get template() {
     return html `<style>
     :host {
