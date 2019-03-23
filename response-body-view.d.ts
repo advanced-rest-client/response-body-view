@@ -12,9 +12,7 @@
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-import {PolymerElement} from '@polymer/polymer/polymer-element.js';
-
-import {html} from '@polymer/polymer/lib/utils/html-tag.js';
+export {ResponseBodyView};
 
 declare namespace UiElements {
 
@@ -70,6 +68,12 @@ declare namespace UiElements {
      * The response content type.
      */
     contentType: string|null|undefined;
+
+    /**
+     * Current value of charset encoding, if available.
+     * It should be set to correctly decode buffer to string
+     */
+    charset: string|null|undefined;
 
     /**
      * If true then the conent preview will be visible instead of the code view

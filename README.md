@@ -51,10 +51,6 @@ class SampleElement extends PolymerElement {
     <response-body-view></response-body-view>
     `;
   }
-
-  _authChanged(e) {
-    console.log(e.detail);
-  }
 }
 customElements.define('sample-element', SampleElement);
 ```
