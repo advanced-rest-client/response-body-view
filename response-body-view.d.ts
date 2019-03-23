@@ -42,15 +42,14 @@ declare namespace UiElements {
    *
    * Custom property | Description | Default
    * ----------------|-------------|----------
-   * `--response-body-view` | Mixin applied to the element | `{}`
-   * `--response-body-view-dialog-title` | Mixin applied to dialog title | `{}`
-   * `--response-body-view-preview-close` | Mixin applied to the response preview close button | `{}`
-   * `--response-body-view-content-actions` | Mixin applied to the content actions container | `{}`
-   * `--response-body-view-dialog-buttons` | Mixin applied to the dialog buttons container | `{}`
-   * `--response-body-view-dialog-close` | Mixin applied to dialog's close button | `{}`
-   * `--response-body-view-dialog-close-hover` | Mixin for dialog's close button when hovering | `{}`
-   * `--response-body-view-dialog-download` | Mixin applies to dialog's download button | `{}`
-   * `--response-body-view-dialog-download-hover` | Mixin for dialog's download when hovering | `{}`
+   * `--response-body-view-color` | Color applied to the element | `inherit`
+   * `--response-body-view-background-color` | Bg color applied to the element | `inherit`
+   * `--response-body-view-preview-background-color` | Bg color of the preview widow | `#fff`
+   * `--content-action-button-color` | Color of a button in the content actions bar | `rgba(0, 0, 0, 0.74)`
+   * `--content-action-button-color-hover` | Color of a button in the content actions bar when hovered | `--accent-color` or `rgba(0, 0, 0, 0.74)`
+   * `--content-action-button-color-active` | Color of a button in the content actions bar when active | `#BDBDBD`
+   * `--response-body-view-preview-close-background-color` | Bg color of the preview close icon | `#fff`
+   * `--response-body-view-preview-close-color` | Color of the preview close icon | `rgba(0,0,0,0.74)`
    */
   class ResponseBodyView extends PolymerElement {
 

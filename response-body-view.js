@@ -52,15 +52,14 @@ import '../../@advanced-rest-client/json-table/json-table.js';
  *
  * Custom property | Description | Default
  * ----------------|-------------|----------
- * `--response-body-view` | Mixin applied to the element | `{}`
- * `--response-body-view-dialog-title` | Mixin applied to dialog title | `{}`
- * `--response-body-view-preview-close` | Mixin applied to the response preview close button | `{}`
- * `--response-body-view-content-actions` | Mixin applied to the content actions container | `{}`
- * `--response-body-view-dialog-buttons` | Mixin applied to the dialog buttons container | `{}`
- * `--response-body-view-dialog-close` | Mixin applied to dialog's close button | `{}`
- * `--response-body-view-dialog-close-hover` | Mixin for dialog's close button when hovering | `{}`
- * `--response-body-view-dialog-download` | Mixin applies to dialog's download button | `{}`
- * `--response-body-view-dialog-download-hover` | Mixin for dialog's download when hovering | `{}`
+ * `--response-body-view-color` | Color applied to the element | `inherit`
+ * `--response-body-view-background-color` | Bg color applied to the element | `inherit`
+ * `--response-body-view-preview-background-color` | Bg color of the preview widow | `#fff`
+ * `--content-action-button-color` | Color of a button in the content actions bar | `rgba(0, 0, 0, 0.74)`
+ * `--content-action-button-color-hover` | Color of a button in the content actions bar when hovered | `--accent-color` or `rgba(0, 0, 0, 0.74)`
+ * `--content-action-button-color-active` | Color of a button in the content actions bar when active | `#BDBDBD`
+ * `--response-body-view-preview-close-background-color` | Bg color of the preview close icon | `#fff`
+ * `--response-body-view-preview-close-color` | Color of the preview close icon | `rgba(0,0,0,0.74)`
  *
  * @polymer
  * @customElement
@@ -72,13 +71,14 @@ export class ResponseBodyView extends PolymerElement {
     :host {
       display: block;
       position: relative;
-      @apply --response-body-view;
+      color: var(--response-body-view-color, inherit);
+      background-color: var(--response-body-view-background-color, inherit);
     }
 
     #webView {
       width: 100%;
       height: 100%;
-      background-color: #fff;
+      background-color: var(--response-body-view-preview-background-color, #fff);
       border: 0;
       margin-top: 12px;
     }
@@ -100,7 +100,7 @@ export class ResponseBodyView extends PolymerElement {
     }
 
     paper-icon-button[active] {
-      background-color: var(--response-raw-viewer-button-active, #BDBDBD);
+      background-color: var(--content-action-button-color-active, #BDBDBD);
       border-radius: 50%;
     }
 
@@ -108,9 +108,8 @@ export class ResponseBodyView extends PolymerElement {
       position: absolute;
       top: 8px;
       right: 12px;
-      background: #fff;
-      color: rgba(0,0,0,0.74);
-      @apply --response-body-view-preview-close;
+      background-color: var(--response-body-view-preview-close-background-color, #fff);
+      color: var(--response-body-view-preview-close-color, rgba(0,0,0,0.74));
     }
 
     [hidden] {
@@ -118,34 +117,17 @@ export class ResponseBodyView extends PolymerElement {
     }
 
     .content-actions {
-      @apply --layout-horizontal;
-      @apply --layout-center;
-      @apply --response-body-view-content-actions;
-    }
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
 
-    .dialog-title {
-      @apply --arc-font-common-base;
-      @apply --response-body-view-dialog-title;
-    }
+      -ms-flex-direction: row;
+      -webkit-flex-direction: row;
+      flex-direction: row;
 
-    .buttons {
-      @apply --response-body-view-dialog-buttons;
-    }
-
-    .button-dismiss {
-      @apply --response-body-view-dialog-close;
-    }
-
-    .button-dismiss:hover {
-      @apply --response-body-view-dialog-close-hover;
-    }
-
-    .button-download {
-      @apply --response-body-view-dialog-download;
-    }
-
-    .button-download:hover {
-      @apply --response-body-view-dialog-download-hover;
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      align-items: center;
     }
 
     .download-link {
@@ -198,14 +180,14 @@ export class ResponseBodyView extends PolymerElement {
     <paper-icon-button class="close-preview" title="Close response preview" icon="arc:close" on-click="closePreview" hidden\$="[[!contentPreview]]"></paper-icon-button>
 
     <paper-dialog id="saveDialog" on-iron-overlay-closed="_downloadDialogClose">
-      <h2 class="dialog-title">Saving to file</h2>
+      <h2>Saving to file</h2>
       <div>
         <p>Your file is now ready to download.</p>
       </div>
-      <div class="buttons">
-        <paper-button class="button-dismiss" dialog-dismiss="">Close</paper-button>
+      <div>
+        <paper-button dialog-dismiss="">Close</paper-button>
         <a href\$="[[downloadFileUrl]]" autofocus="" download\$="[[downloadFileName]]" on-click="_downloadIconTap" target="_blank" class="download-link">
-          <paper-button class="button-download">Download file</paper-button>
+          <paper-button>Download file</paper-button>
         </a>
       </div>
     </paper-dialog>
