@@ -70,7 +70,7 @@
       fetch(scope.url, opts)
       .then(function(response) {
         ct = response.headers.get('content-type');
-        return response.text();
+        return response.arrayBuffer();
       })
       .then(function(text) {
         scope.response = text;
