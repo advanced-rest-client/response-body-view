@@ -398,22 +398,14 @@ class ResponseBodyView extends PolymerElement {
    * @param {String} payload
    */
   _responseTextChanged(payload) {
+    if (this.__setRawDebouncer) {
+      return;
+    }
     this._setIsXml(false);
     this._setIsJson(false);
     this._setIsParsed(false);
-    if (payload === undefined) {
-      this.set('_raw', undefined);
-      return;
-    }
-    if (payload === null || payload === false) {
-      this.set('_raw', payload);
-      return;
-    }
     this.set('_raw', undefined);
-    if (!payload) {
-      return;
-    }
-    if (this.__setRawDebouncer) {
+    if (payload === undefined) {
       return;
     }
     this.__setRawDebouncer = true;
@@ -490,7 +482,8 @@ class ResponseBodyView extends PolymerElement {
    */
   _getRawContent() {
     let raw = this._raw;
-    if (!raw || typeof raw === 'string') {
+    const type = typeof raw;
+    if (['string', 'boolean', 'undefined'].indexOf(type) !== -1) {
       return raw;
     }
     if (raw && raw.type === 'Buffer') {
@@ -498,7 +491,12 @@ class ResponseBodyView extends PolymerElement {
     }
     const ce = this.charset || 'utf-8';
     const decoder = new TextDecoder(ce);
-    return decoder.decode(raw);
+    try {
+      return decoder.decode(raw);
+    } catch (e) {
+      console.warn(e);
+      return '';
+    }
   }
   // Opens response preview in new layer
   _openResponsePreview() {
@@ -698,8 +696,8 @@ class ResponseBodyView extends PolymerElement {
    * @return {Boolean} Boolean value read from the value.
    */
   _localStorageValueToBoolean(value) {
-    if (!value) {
-      return false;
+    if (typeof value === 'boolean') {
+      return value;
     }
     if (value === 'true') {
       value = true;

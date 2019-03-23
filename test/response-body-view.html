@@ -150,6 +150,236 @@
         assert.equal(result, string);
       });
     });
+
+    suite('_onPrismHighlightTimeout()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+        element.activeView = 1;
+      });
+
+      test('Sets __parsedView', () => {
+        element._onPrismHighlightTimeout(true);
+        assert.equal(element.__parsedView, 1);
+      });
+
+      test('Sets activeView', () => {
+        element._onPrismHighlightTimeout(true);
+        assert.equal(element.activeView, 0);
+      });
+
+      test('Opens the toast', () => {
+        element._onPrismHighlightTimeout(true);
+        assert.isTrue(element.$.highlightTimeout.opened);
+      });
+
+      test('Does nothing when no state', () => {
+        element._onPrismHighlightTimeout(false);
+        assert.isUndefined(element.__parsedView);
+      });
+    });
+
+    suite('_responseTextChanged()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Sets isXml to false', () => {
+        element._setIsXml(true);
+        element._responseTextChanged('');
+        assert.isFalse(element.isXml);
+      });
+
+      test('Sets isJson to false', () => {
+        element._setIsJson(true);
+        element._responseTextChanged('');
+        assert.isFalse(element.isJson);
+      });
+
+      test('Sets isParsed to false', () => {
+        element._setIsParsed(true);
+        element._responseTextChanged('');
+        assert.isFalse(element.isParsed);
+      });
+
+      test('Sets _raw undefined', () => {
+        element._raw = 'test';
+        element._responseTextChanged();
+        assert.isUndefined(element._raw);
+        assert.isUndefined(element.__setRawDebouncer);
+      });
+
+      test('Sets _raw null', () => {
+        element._responseTextChanged(null);
+        assert.equal(element._raw, null);
+      });
+
+      [
+        false, true, 'value'
+      ].forEach((item) => {
+        test(`Sets _raw "${item}"`, (done) => {
+          element.responseText = item;
+          setTimeout(() => {
+            assert.equal(element._raw, item);
+            done();
+          }, 1);
+        });
+      });
+
+      test('Does nothing when __setRawDebouncer is set', () => {
+        element.__setRawDebouncer = true;
+        element._setIsXml(true);
+        element._responseTextChanged('');
+        assert.isTrue(element.isXml);
+      });
+
+      test('Clears __setRawDebouncer', (done) => {
+        element.responseText = 'test';
+        setTimeout(() => {
+          assert.isFalse(element.__setRawDebouncer);
+          done();
+        }, 1);
+      });
+    });
+
+    suite('closePreview()', () => {
+      test('Resets contentPreview', () => {
+        const element = fixture('basic');
+        element.contentPreview = true;
+        element.closePreview();
+        assert.isFalse(element.contentPreview);
+      });
+    });
+
+    suite('_computeRenderWithRaw()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns true when argument is 0', () => {
+        const result = element._computeRenderWithRaw(0);
+        assert.isTrue(result);
+      });
+
+      test('Returns false when argument is not 0', () => {
+        const result = element._computeRenderWithRaw(1);
+        assert.isFalse(result);
+      });
+    });
+
+    suite('_computeRenderShowRaw()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns true when argument is not 0', () => {
+        const result = element._computeRenderShowRaw(1);
+        assert.isTrue(result);
+      });
+
+      test('Returns false when argument is 0', () => {
+        const result = element._computeRenderShowRaw(0);
+        assert.isFalse(result);
+      });
+    });
+
+    suite('_computeRenderPreviewResponse()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns true when argument is 1', () => {
+        const result = element._computeRenderPreviewResponse(1);
+        assert.isTrue(result);
+      });
+
+      test('Returns false when argument is not 1', () => {
+        const result = element._computeRenderPreviewResponse(0);
+        assert.isFalse(result);
+      });
+    });
+
+    suite('_computeRenderToggleTable()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns true when argument is 2', () => {
+        const result = element._computeRenderToggleTable(2);
+        assert.isTrue(result);
+      });
+
+      test('Returns true when argument is 4', () => {
+        const result = element._computeRenderToggleTable(4);
+        assert.isTrue(result);
+      });
+
+      test('Returns false otherwise', () => {
+        const result = element._computeRenderToggleTable(1);
+        assert.isFalse(result);
+      });
+    });
+
+    suite('_localStorageValueToBoolean()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      [
+        [false, false],
+        [true, true],
+        ['false', false],
+        ['true', true]
+      ].forEach((item) => {
+        test(`Returns  "${item[1]}" for "${item[0]}"`, () => {
+          const result = element._localStorageValueToBoolean(item[0]);
+          assert.equal(result, item[1]);
+        });
+      });
+    });
+
+    suite('_onStorageChanged()', () => {
+      let element;
+      let ev;
+      setup(function() {
+        localStorage.removeItem('jsonTableEnabled');
+        element = fixture('basic');
+        ev = {
+          key: 'jsonTableEnabled',
+          newValue: 'true'
+        };
+      });
+
+      test('Sets jsonTableView', () => {
+        element.jsonTableView = false;
+        element._onStorageChanged(ev);
+        assert.isTrue(element.jsonTableView);
+      });
+
+      test('Skips when jsonTableView already set', () => {
+        element.jsonTableView = true;
+        element._onStorageChanged(ev);
+        assert.isTrue(element.jsonTableView);
+      });
+
+      test('Skips when no newValue value', () => {
+        delete ev.newValue;
+        element._onStorageChanged(ev);
+        assert.isUndefined(element.jsonTableView);
+      });
+
+      test('Skips when key is invalid', () => {
+        ev.key = 'other';
+        element._onStorageChanged(ev);
+        assert.isUndefined(element.jsonTableView);
+      });
+    });
     </script>
 
   </body>
