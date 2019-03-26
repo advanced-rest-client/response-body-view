@@ -54,7 +54,7 @@
     "@advanced-rest-client/response-highlighter": "^3.0.0-preview.1",
     "@advanced-rest-client/response-raw-viewer": "^3.0.0-preview.1",
     "@advanced-rest-client/xml-viewer": "^3.0.0-preview.1",
-    "@api-components/clipboard-copy": "^3.0.0-preview.1",
+    "@advanced-rest-client/clipboard-copy": "^3.0.0-preview.1",
     "@polymer/iron-pages": "^3.0.0",
     "@polymer/paper-dialog": "^3.0.0",
     "@polymer/paper-icon-button": "^3.0.0",

@@ -20,7 +20,7 @@ import '../../@advanced-rest-client/response-raw-viewer/response-raw-viewer.js';
 import '../../@advanced-rest-client/xml-viewer/xml-viewer.js';
 import '../../@advanced-rest-client/json-viewer/json-viewer.js';
 import '../../@advanced-rest-client/response-highlighter/response-highlighter.js';
-import '../../@api-components/clipboard-copy/clipboard-copy.js';
+import '../../@advanced-rest-client/clipboard-copy/clipboard-copy.js';
 import '../../@polymer/paper-dialog/paper-dialog.js';
 import '../../@polymer/paper-icon-button/paper-icon-button.js';
 import '../../@polymer/paper-toast/paper-toast.js';
