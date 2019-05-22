@@ -12,7 +12,7 @@
     "url": "git://github.com/advanced-rest-client/response-body-view.git"
   },
   "name": "@advanced-rest-client/response-body-view",
-  "version": "3.0.0-preview.6",
+  "version": "3.0.0-preview.7",
   "license": "Apache-2.0",
   "authors": [
     "Pawel Psztyc",
@@ -20,16 +20,16 @@
   ],
   "devDependencies": {
     "@polymer/gen-typescript-declarations": "^1.6.1",
-    "@polymer/iron-demo-helpers": "^3.0.0",
-    "@webcomponents/webcomponentsjs": "^2.0.0",
-    "@polymer/iron-test-helpers": "^3.0.0",
     "@polymer/iron-component-page": "^4.0.0",
+    "@polymer/iron-demo-helpers": "^3.1.0",
+    "@polymer/iron-test-helpers": "^3.0.0",
     "@polymer/paper-button": "^3.0.0",
-    "@polymer/paper-input": "^3.0.0",
+    "@polymer/paper-input": "^3.0.2",
     "@polymer/test-fixture": "^4.0.2",
+    "@webcomponents/webcomponentsjs": "^2.2.10",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "sinon": "^7.2.3",
+    "sinon": "^7.3.2",
     "wct-mocha": "^1.0.0"
   },
   "main": "response-body-view.js",
@@ -48,17 +48,17 @@
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
   "dependencies": {
-    "@advanced-rest-client/arc-icons": "^3.0.0-preview.1",
-    "@advanced-rest-client/json-table": "^3.0.0-preview.1",
-    "@advanced-rest-client/json-viewer": "^3.0.0-preview.1",
-    "@advanced-rest-client/response-highlighter": "^3.0.0-preview.1",
-    "@advanced-rest-client/response-raw-viewer": "^3.0.0-preview.1",
-    "@advanced-rest-client/xml-viewer": "^3.0.0-preview.1",
+    "@advanced-rest-client/arc-icons": "^3.0.0-preview.2",
     "@advanced-rest-client/clipboard-copy": "^3.0.0-preview.1",
+    "@advanced-rest-client/json-table": "^3.0.0-preview.2",
+    "@advanced-rest-client/json-viewer": "^3.0.0-preview.2",
+    "@advanced-rest-client/response-highlighter": "^3.0.0-preview.5",
+    "@advanced-rest-client/response-raw-viewer": "^3.0.0-preview.2",
+    "@advanced-rest-client/xml-viewer": "^3.0.0-preview.2",
     "@polymer/iron-pages": "^3.0.0",
     "@polymer/paper-dialog": "^3.0.0",
     "@polymer/paper-icon-button": "^3.0.0",
     "@polymer/paper-toast": "^3.0.0",
-    "@polymer/polymer": "^3.0.0"
+    "@polymer/polymer": "^3.2.0"
   }
 }
