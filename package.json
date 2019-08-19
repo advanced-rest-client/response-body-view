@@ -1,23 +1,21 @@
 {
   "name": "@advanced-rest-client/response-body-view",
   "description": "An element to display the response body",
-  "version": "2.0.7",
+  "version": "3.0.0",
   "license": "Apache-2.0",
+  "main": "response-body-view.js",
+  "keywords": [
+    "web-components",
+    "response",
+    "body",
+    "viewer"
+  ],
   "authors": [
-    "Pawel Psztyc",
+    "Pawel Psztyc"
+  ],
+  "contributors": [
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
-  "devDependencies": {
-    "@polymer/gen-typescript-declarations": "^1.6.1"
-  },
-  "private": false,
-  "main": "response-body-view.html",
-  "scripts": {
-    "lint": "polymer lint response-body-view.html",
-    "test-sauce": "polymer test --plugin sauce --job-name \"response-body-view:local-test\"",
-    "test": "polymer test --plugin local",
-    "update-types": "gen-typescript-declarations --deleteExisting --outDir ."
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/advanced-rest-client/response-body-view.git"
@@ -25,5 +23,58 @@
   "bugs": {
     "url": "https://github.com/advanced-rest-client/response-body-view/issues",
     "email": "arc@mulesoft.com"
+  },
+  "dependencies": {
+    "@advanced-rest-client/clipboard-copy": "^3.0.1",
+    "@advanced-rest-client/json-table": "^3.1.1",
+    "@advanced-rest-client/json-viewer": "^3.1.0",
+    "@advanced-rest-client/response-highlighter": "^3.0.1",
+    "@advanced-rest-client/response-raw-viewer": "^3.0.0",
+    "@anypoint-web-components/anypoint-button": "^1.0.3",
+    "lit-element": "^2.0.1",
+    "lit-html": "^1.1.2"
+  },
+  "devDependencies": {
+    "@advanced-rest-client/arc-demo-helper": "^1.0.14",
+    "@advanced-rest-client/eslint-config": "^1.0.6",
+    "@advanced-rest-client/prettier-config": "^0.1.0",
+    "@advanced-rest-client/testing-karma-sl": "^1.0.3",
+    "@anypoint-web-components/anypoint-input": "^0.1.5",
+    "@anypoint-web-components/anypoint-styles": "^1.0.0-preview.1",
+    "@commitlint/cli": "^8.1.0",
+    "@commitlint/config-conventional": "^7.0.0",
+    "@open-wc/testing": "^2.2.8",
+    "@open-wc/testing-karma": "^3.1.18",
+    "@polymer/gen-typescript-declarations": "^1.6.2",
+    "@polymer/iron-test-helpers": "^3.0.0",
+    "deepmerge": "^4.0.0",
+    "es-dev-server": "^1.12.0",
+    "husky": "^1.0.0",
+    "karma": "^4.2.0",
+    "lint-staged": "^9.2.1",
+    "sinon": "^7.4.1"
+  },
+  "scripts": {
+    "test": "karma start --coverage",
+    "update-types": "gen-typescript-declarations --deleteExisting --outDir .",
+    "start": "es-dev-server --app-index demo/index.html --node-resolve --open --watch",
+    "start:compatibility": "es-dev-server --app-index demo/index.html --compatibility all --node-resolve --open --watch",
+    "lint:eslint": "eslint --ext .js,.html .",
+    "format:eslint": "eslint --ext .js,.html . --fix",
+    "lint:prettier": "prettier \"**/*.js\" --list-different || (echo '↑↑ these files are not prettier formatted ↑↑' && exit 1)",
+    "format:prettier": "prettier \"**/*.js\" --write",
+    "lint": "npm run lint:eslint && npm run lint:prettier",
+    "format": "npm run format:eslint && npm run format:prettier",
+    "test:watch": "karma start --auto-watch=true --single-run=false",
+    "test:legacy": "karma start --legacy --coverage",
+    "test:legacy:watch": "karma start --legacy --auto-watch=true --single-run=false",
+    "test:sl": "karma start karma.sl.config.js --legacy --coverage",
+    "generate-model": "node demo/model.js"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
   }
 }
