@@ -11,21 +11,32 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
-import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
-import '../../@polymer/polymer/lib/elements/dom-if.js';
-import '../../@advanced-rest-client/arc-icons/arc-icons.js';
-import '../../@polymer/iron-pages/iron-pages.js';
-import '../../@advanced-rest-client/response-raw-viewer/response-raw-viewer.js';
-import '../../@advanced-rest-client/xml-viewer/xml-viewer.js';
-import '../../@advanced-rest-client/json-viewer/json-viewer.js';
-import '../../@advanced-rest-client/response-highlighter/response-highlighter.js';
-import '../../@advanced-rest-client/clipboard-copy/clipboard-copy.js';
-import '../../@polymer/paper-dialog/paper-dialog.js';
-import '../../@polymer/paper-icon-button/paper-icon-button.js';
-import '../../@polymer/paper-toast/paper-toast.js';
-import '../../@advanced-rest-client/json-table/json-table.js';
-/* eslint-disable max-len */
+import { html, css, LitElement } from 'lit-element';
+import '@advanced-rest-client/response-raw-viewer/response-raw-viewer.js';
+import '@advanced-rest-client/json-viewer/json-viewer.js';
+import '@advanced-rest-client/response-highlighter/response-highlighter.js';
+import '@advanced-rest-client/clipboard-copy/clipboard-copy.js';
+import '@advanced-rest-client/json-table/json-table.js';
+import '@anypoint-web-components/anypoint-button/anypoint-button.js';
+
+export let hasLocalStorage;
+/* global chrome */
+/* istanbul ignore next */
+if (typeof chrome !== 'undefined' && chrome.i18n) {
+  // Chrome apps have `chrome.i18n` property, regular website doesn't.
+  // This is to avoid annoying warning message in Chrome apps.
+  hasLocalStorage = false;
+} else {
+  try {
+    localStorage.getItem('test');
+    hasLocalStorage = true;
+    /* istanbul ignore next */
+  } catch (_) {
+    /* istanbul ignore next */
+    hasLocalStorage = false;
+  }
+}
+
 /**
  * An element to display a HTTP response body.
  *
@@ -42,66 +53,17 @@ import '../../@advanced-rest-client/json-table/json-table.js';
  * `export-data` custom event first to check if hosting application implements
  * other save functionality. See event description for more information.
  *
- * ## Changes in version 2
  *
- * - Text search library is no longer included
- *
- * ### Styling
- *
- * `<response-body-view>` provides the following custom properties and mixins for styling:
- *
- * Custom property | Description | Default
- * ----------------|-------------|----------
- * `--response-body-view-color` | Color applied to the element | `inherit`
- * `--response-body-view-background-color` | Bg color applied to the element | `inherit`
- * `--response-body-view-preview-background-color` | Bg color of the preview widow | `#fff`
- * `--content-action-button-color` | Color of a button in the content actions bar | `rgba(0, 0, 0, 0.74)`
- * `--content-action-button-color-hover` | Color of a button in the content actions bar when hovered | `--accent-color` or `rgba(0, 0, 0, 0.74)`
- * `--content-action-button-color-active` | Color of a button in the content actions bar when active | `#BDBDBD`
- * `--response-body-view-preview-close-background-color` | Bg color of the preview close icon | `#fff`
- * `--response-body-view-preview-close-color` | Color of the preview close icon | `rgba(0,0,0,0.74)`
- *
- * @polymer
  * @customElement
  * @memberof UiElements
  */
-export class ResponseBodyView extends PolymerElement {
-  static get template() {
-    return html `<style>
-    :host {
+export class ResponseBodyView extends LitElement {
+  static get styles() {
+    return css`:host {
       display: block;
       position: relative;
       color: var(--response-body-view-color, inherit);
       background-color: var(--response-body-view-background-color, inherit);
-    }
-
-    #webView {
-      width: 100%;
-      height: 100%;
-      background-color: var(--response-body-view-preview-background-color, #fff);
-      border: 0;
-      margin-top: 12px;
-    }
-
-    #saveDialog {
-      min-width: 320px;
-    }
-
-    paper-icon-button {
-      transition: color 0.25s ease-in-out;
-    }
-
-    paper-icon-button[toggles] {
-      color: var(--content-action-button-color, rgba(0, 0, 0, 0.74));
-    }
-
-    paper-icon-button:hover {
-      color: var(--content-action-button-color-hover, var(--accent-color, rgba(0, 0, 0, 0.74)));
-    }
-
-    paper-icon-button[active] {
-      background-color: var(--content-action-button-color-active, #BDBDBD);
-      border-radius: 50%;
     }
 
     .close-preview {
@@ -117,16 +79,8 @@ export class ResponseBodyView extends PolymerElement {
     }
 
     .content-actions {
-      display: -ms-flexbox;
-      display: -webkit-flex;
       display: flex;
-
-      -ms-flex-direction: row;
-      -webkit-flex-direction: row;
       flex-direction: row;
-
-      -ms-flex-align: center;
-      -webkit-align-items: center;
       align-items: center;
     }
 
@@ -135,200 +89,260 @@ export class ResponseBodyView extends PolymerElement {
       color: inherit;
       outline: none;
     }
-    </style>
-    <template is="dom-if" if="[[hasData]]">
-      <div class="content-actions" hidden\$="[[contentPreview]]">
-        <paper-icon-button data-action="clipboard-copy" icon="arc:content-copy" on-click="_copyToClipboard" title="Copy content to clipboard"></paper-icon-button>
-        <paper-icon-button data-action="save-file" icon="arc:archive" on-click="_saveFile" title="Save content to file"></paper-icon-button>
-        <paper-icon-button data-action="raw-toggle" icon="arc:code" toggles="" active="{{rawView}}" title="Toogle raw response view"></paper-icon-button>
-        <template is="dom-if" if="[[_computeRenderPreviewResponse(activeView)]]">
-          <paper-icon-button data-action="preview" icon="arc:visibility" toggles="" active="{{contentPreview}}" title="Preview response"></paper-icon-button>
-        </template>
-        <template is="dom-if" if="[[isJson]]">
-          <paper-icon-button data-action="json-table" icon="arc:view-column" toggles="" active="{{jsonTableView}}" title="Toggle structured table view"></paper-icon-button>
-        </template>
-        <template is="dom-if" if="[[_computeRenderWithRaw(activeView)]]">
-          <paper-icon-button icon="arc:wrap-text" toggles="" active="{{rawTextWrap}}" title="Toggle text wrapping"></paper-icon-button>
-        </template>
-      </div>
-    </template>
-    <iron-pages selected="{{activeView}}" hidden\$="[[contentPreview]]">
-      <response-raw-viewer response-text="[[_getRawContent(_raw)]]" wrap-text\$="[[rawTextWrap]]"></response-raw-viewer>
-      <section>
-        <template is="dom-if" if="[[isParsed]]" restamp="true">
-          <response-highlighter response-text="[[_getRawContent(_raw)]]" content-type="[[contentType]]" is-timeout="{{prismTimeout}}"></response-highlighter>
-        </template>
-      </section>
-      <section>
-        <template is="dom-if" if="[[isJson]]" restamp="true">
-          <json-viewer json="[[_getRawContent(_raw)]]"></json-viewer>
-        </template>
-      </section>
-      <section>
-        <template is="dom-if" if="[[isXml]]" restamp="true">
-          <xml-viewer xml="[[_getRawContent(_raw)]]"></xml-viewer>
-        </template>
-      </section>
-      <section>
-        <template is="dom-if" if="[[_computeRenderJsonTable(isJson, jsonTableView)]]" restamp="true">
-          <json-table json="[[_getRawContent(_raw)]]"></json-table>
-        </template>
-      </section>
-    </iron-pages>
 
-    <iframe id="webView" hidden\$="[[!contentPreview]]"></iframe>
-    <paper-icon-button class="close-preview" title="Close response preview" icon="arc:close" on-click="closePreview" hidden\$="[[!contentPreview]]"></paper-icon-button>
+    .save-dialog {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 12px 0;
+    }
 
-    <paper-dialog id="saveDialog" on-iron-overlay-closed="_downloadDialogClose">
+    .save-dialog h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.01rem;
+    }`;
+  }
+
+  _activeTemplate(activeView, content) {
+    switch (activeView) {
+      case 0: return html`<response-raw-viewer
+        .responseText="${content}"
+        .wrapText="${this.rawTextWrap}"></response-raw-viewer>`;
+      case 1: return html`<response-highlighter
+        .responseText="${content}"
+        .contentType="${this.contentType}"></response-highlighter>`;
+      case 2: return html`<json-viewer .json="${content}"></json-viewer>`;
+      case 3: return html`<json-table .json="${content}"></json-table>`;
+      default:
+    }
+  }
+
+  _downloadTemplate() {
+    const {
+      _downloadFileUrl,
+      _downloadFileName
+    } = this;
+    return html`<div class="save-dialog">
       <h2>Saving to file</h2>
       <div>
         <p>Your file is now ready to download.</p>
       </div>
       <div>
-        <paper-button dialog-dismiss="">Close</paper-button>
-        <a href\$="[[downloadFileUrl]]" autofocus="" download\$="[[downloadFileName]]" on-click="_downloadIconTap" target="_blank" class="download-link">
-          <paper-button>Download file</paper-button>
+        <anypoint-button emphasis="low" @click="${this._downloadDialogClose}">Cancel</anypoint-button>
+        <a
+          href="${_downloadFileUrl}"
+          download="${_downloadFileName}"
+          @click="${this._downloadHandler}"
+          target="_blank"
+          class="download-link">
+          <anypoint-button emphasis="high">Download file</anypoint-button>
         </a>
       </div>
-    </paper-dialog>
-    <clipboard-copy content="[[_getRawContent(_raw)]]"></clipboard-copy>
-    <paper-toast id="safariDownload" text="Safari doesn't support file download. Please, use other browser."></paper-toast>
-    <paper-toast id="highlightTimeout"></paper-toast>
-
-    <script id="preview" type="text/html">
-      <!DOCTYPE html><html><head><title>Advanced REST client - preview</title><style>
-        body,html{overflow:auto;margin:0;padding:0}body{margin:16px;min-height:200px}
-        </style></head><body></body></html>
-    </script>`;
+    </div>`;
   }
+
+  render() {
+    const {
+      contentType,
+      rawView,
+      activeView,
+      jsonTableView,
+      rawTextWrap,
+      _downloadFileUrl,
+      _raw,
+      _isJson
+    } = this;
+    const content = _raw && this._getRawContent(_raw);
+    return html `
+    ${contentType && content ? html`<div class="content-actions">
+      <anypoint-button
+        part="content-action-button, code-content-action-button"
+        class="action-button"
+        data-action="copy"
+        emphasis="medium"
+        @click="${this._copyToClipboard}"
+        aria-label="Press to copy response to clipboard"
+        title="Copy response to clipboard">Copy</anypoint-button>
+      <anypoint-button
+        part="content-action-button, code-content-action-button"
+        class="action-button"
+        data-action="save-file"
+        emphasis="medium"
+        @click="${this._saveFile}"
+        aria-label="Press to save content to file"
+        title="Save content to file">Save</anypoint-button>
+      <anypoint-button
+        part="content-action-button, code-content-action-button"
+        class="action-button"
+        data-action="raw-toggle"
+        emphasis="medium"
+        toggles
+        .active="${rawView}"
+        @active-changed="${this._sourceViewHandler}"
+        aria-label="Press to toggle source view"
+        title="Toogle source view">Source view</anypoint-button>
+
+      ${_isJson ? html`<anypoint-button
+        part="content-action-button, code-content-action-button"
+        class="action-button"
+        data-action="json-table"
+        toggles
+        .active="${jsonTableView}"
+        @active-changed="${this._jsonTableViewHandler}"
+        aria-label="Press to activate table view for JSON data"
+        title="Toggle structured table view">Data table</anypoint-button>` : undefined}
+
+      ${activeView === 0 ? html`<anypoint-button
+        part="content-action-button, code-content-action-button"
+        class="action-button"
+        data-action="text-wrap"
+        toggles
+        .active="${rawTextWrap}"
+        @active-changed="${this._rawTextWrapViewHandler}"
+        aria-label="Press to toggle text wrapping in the view"
+        title="Toggle text wrapping">Wrap text</anypoint-button>` : undefined}
+    </div>` : undefined}
+
+    ${_downloadFileUrl ? this._downloadTemplate() : this._activeTemplate(activeView, content)}
+
+    <clipboard-copy .content="${content}"></clipboard-copy>`;
+  }
+
   static get properties() {
     return {
       /**
        * Raw response as a response text.
        */
-      responseText: {
-        type: String,
-        observer: '_responseTextChanged'
-      },
-      // A variable to be set after the `responseText` change
-      _raw: String,
+      responseText: { type: String },
+      /**
+       * A variable to be set after the `responseText` change
+       */
+      _raw: { type: String },
       /**
        * The response content type.
        */
-      contentType: String,
+      contentType: { type: String },
       /**
        * Current value of charset encoding, if available.
        * It should be set to correctly decode buffer to string
        */
-      charset: String,
-      /**
-       * If true then the conent preview will be visible instead of the code view
-       */
-      contentPreview: {
-        type: Boolean,
-        value: false,
-        observer: '_contentPreviewChanged'
-      },
+      charset: { type: String },
       /**
        * Computed value, true if the parsed view can be displayed.
        * If false then the syntax highligter will be removed from the DOM
        * so it will not try to do the parsing job if it is not necessary.
        */
-      isParsed: {
-        type: Boolean,
-        value: false,
-        readOnly: true
-      },
+      _isParsed: { type: Boolean },
       /**
        * Computed value, true if the JSON view can be displayed.
        * If false then the syntax highligter will be removed from the DOM
        * so it will not try to do the parsing job if it is not necessary.
        */
-      isJson: {
-        type: Boolean,
-        value: false,
-        readOnly: true
-      },
-      /**
-       * Computed value, true if the XML view can be displayed.
-       * If false then the syntax highligter will be removed from the DOM
-       */
-      isXml: {
-        type: Boolean,
-        value: false,
-        readOnly: true
-      },
+      _isJson: { type: Boolean },
       /**
        * Selected view.
        */
-      activeView: Number,
+      activeView: { type: Number },
       /**
        * When saving a file this will be the download URL created by the
        * `URL.createObjectURL` function.
        */
-      downloadFileUrl: {
-        type: String,
-        readOnly: true
-      },
+      _downloadFileUrl: { type: String },
       /**
        * Autogenerated file name for the download file.
        */
-      downloadFileName: {
-        type: String,
-        readOnly: true
-      },
-      // Is true then the text in "raw" preview will be wrapped.
-      rawTextWrap: Boolean,
-      // If set it opens the "raw" view.
-      rawView: {
-        type: Boolean,
-        observer: '_toggleViewSource'
-      },
-      // If set it opens the JSON table view.
-      jsonTableView: {
-        type: Boolean,
-        observer: '_jsonTableViewChanged'
-      },
-      // Computed value, true if `contentType` and `_raw` are set
-      hasData: {
-        value: false,
-        type: Boolean,
-        computed: '_computeHasData(contentType, _raw)'
-      },
-
-      prismTimeout: {
-        type: Boolean,
-        observer: '_onPrismHighlightTimeout'
-      },
+      _downloadFileName: { type: String },
       /**
-       * True if current environment has localStorage suppport.
-       * Chrome apps do not have localStorage property.
+       * When true then the text in "raw" preview will be wrapped.
        */
-      hasLocalStorage: {
-        type: Boolean,
-        readOnly: true,
-        value: function() {
-          /* global chrome */
-          if (typeof chrome !== 'undefined' && chrome.i18n) {
-            // Chrome apps have `chrome.i18n` property, regular website doesn't.
-            // This is to avoid annoying warning message in Chrome apps.
-            return false;
-          }
-          try {
-            localStorage.getItem('test');
-            return true;
-          } catch (_) {
-            return false;
-          }
-        }
-      }
+      rawTextWrap: { type: Boolean },
+      /**
+       * When set it opens the "raw" view.
+       */
+      rawView: { type: Boolean },
+      /**
+       * If set it opens the JSON table view.
+       */
+      jsonTableView: { type: Boolean }
     };
   }
 
-  static get observers() {
-    return [
-      '_contentTypeChanged(contentType, _raw)'
-    ];
+  get responseText() {
+    return this._responseText;
+  }
+
+  set responseText(value) {
+    const old = this._responseText;
+    /* istanbul ignore if */
+    if (old === value) {
+      return;
+    }
+    this._responseText = value;
+    if (this._downloadFileUrl) {
+      this._downloadDialogClose();
+    }
+    this._responseTextChanged(value);
+  }
+
+  get rawView() {
+    return this._rawView;
+  }
+
+  set rawView(value) {
+    const old = this._rawView;
+    /* istanbul ignore if */
+    if (old === value) {
+      return;
+    }
+    this._rawView = value;
+    this.requestUpdate('rawView', old);
+    this._toggleViewSource(value);
+  }
+
+  get jsonTableView() {
+    return this._jsonTableView;
+  }
+
+  set jsonTableView(value) {
+    const old = this._jsonTableView;
+    /* istanbul ignore if */
+    if (old === value) {
+      return;
+    }
+    this._jsonTableView = value;
+    this.requestUpdate('jsonTableView', old);
+    this._jsonTableViewChanged(value);
+  }
+
+  get contentType() {
+    return this._contentType;
+  }
+
+  set contentType(value) {
+    const old = this._contentType;
+    /* istanbul ignore if */
+    if (old === value) {
+      return;
+    }
+    this._contentType = value;
+    this.requestUpdate('contentType', old);
+    this._contentTypeChanged(value, this._raw);
+  }
+
+  get _raw() {
+    return this.__raw;
+  }
+
+  set _raw(value) {
+    const old = this.__raw;
+    /* istanbul ignore if */
+    if (old === value) {
+      return;
+    }
+    this.__raw = value;
+    this.requestUpdate('_raw', old);
+    this._contentTypeChanged(this.contentType, value);
   }
   /**
    * @constructor
@@ -340,37 +354,22 @@ export class ResponseBodyView extends PolymerElement {
   }
 
   connectedCallback() {
-    super.connectedCallback();
+    if (super.connectedCallback) {
+      super.connectedCallback();
+    }
     window.addEventListener('storage', this._onStorageChanged);
     window.addEventListener('json-table-state-changed', this._onJsonTableStateChanged);
   }
 
   disconnectedCallback() {
-    super.disconnectedCallback();
+    if (super.disconnectedCallback) {
+      super.disconnectedCallback();
+    }
+    if (this._downloadFileUrl) {
+      this._downloadDialogClose();
+    }
     window.removeEventListener('storage', this._onStorageChanged);
     window.removeEventListener('json-table-state-changed', this._onJsonTableStateChanged);
-    if (this.__previewUrl) {
-      window.URL.revokeObjectURL(this.__previewUrl);
-      this.__previewUrl = undefined;
-    }
-  }
-
-  /**
-   * Handler for `prismTimeout` property change.
-   * Displays "raw" view instead of syntax highlighting.
-   *
-   * @param {Boolean} state
-   */
-  _onPrismHighlightTimeout(state) {
-    if (!state) {
-      return;
-    }
-    this.__parsedView = this.activeView;
-    this.activeView = 0;
-    let message = 'Response pasing timeout. The response body might be';
-    message += ' to long.';
-    this.$.highlightTimeout.text = message;
-    this.$.highlightTimeout.opened = true;
   }
 
   /**
@@ -383,23 +382,17 @@ export class ResponseBodyView extends PolymerElement {
     if (this.__setRawDebouncer) {
       return;
     }
-    this._setIsXml(false);
-    this._setIsJson(false);
-    this._setIsParsed(false);
-    this.set('_raw', undefined);
+    this._isJson = false;
+    this._isParsed = false;
+    this._raw = undefined;
     if (payload === undefined) {
       return;
     }
     this.__setRawDebouncer = true;
     setTimeout(() => {
       this.__setRawDebouncer = false;
-      this.set('_raw', this.responseText);
+      this._raw = this.responseText;
     }, 1);
-  }
-
-  // Computes value for `hasData` property
-  _computeHasData(contentType, _raw) {
-    return !!(contentType && _raw);
   }
   /**
    * Updates `activeView` property based on `contentType` value.
@@ -409,13 +402,8 @@ export class ResponseBodyView extends PolymerElement {
   _contentTypeChanged(contentType) {
     let parsed = false;
     let json = false;
-    let xml = false;
-    this.contentPreview = false;
     if (contentType) {
-      if (contentType.indexOf('xml') !== -1) {
-        this.activeView = 3;
-        xml = true;
-      } else if (contentType.indexOf('json') !== -1) {
+      if (contentType.indexOf('json') !== -1) {
         this.activeView = 2;
         json = true;
       } else {
@@ -423,9 +411,8 @@ export class ResponseBodyView extends PolymerElement {
         parsed = true;
       }
     }
-    this._setIsXml(xml);
-    this._setIsJson(json);
-    this._setIsParsed(parsed);
+    this._isJson = json;
+    this._isParsed = parsed;
     if (json) {
       this._ensureJsonTable();
     }
@@ -436,7 +423,8 @@ export class ResponseBodyView extends PolymerElement {
    * (if it is turned on) and handles view change if needed.
    */
   _ensureJsonTable() {
-    if (!this.hasLocalStorage) {
+    /* istanbul ignore if */
+    if (!hasLocalStorage) {
       return;
     }
     const isTable = this._localStorageValueToBoolean(localStorage.jsonTableEnabled);
@@ -444,17 +432,9 @@ export class ResponseBodyView extends PolymerElement {
       this.jsonTableView = isTable;
     }
     if (this.jsonTableView) {
-      this.activeView = 4;
-    } else if (this.activeView === 4) {
-      this.activeView = 2;
-    }
-  }
-  // Handler for `this.contentPreview` change.
-  _contentPreviewChanged(val) {
-    if (val) {
-      this._openResponsePreview();
-    } else {
-      this._closeResponsePreview();
+      this.activeView = 3;
+    } else if (this.activeView === 3) {
+      this.activeView = 1;
     }
   }
   /**
@@ -476,70 +456,47 @@ export class ResponseBodyView extends PolymerElement {
     try {
       return decoder.decode(raw);
     } catch (e) {
-      console.warn(e);
       return '';
-    }
-  }
-  // Opens response preview in new layer
-  _openResponsePreview() {
-    const context = this;
-    const raw = this._getRawContent();
-
-    function onLoad() {
-      try {
-        context.$.webView.contentWindow.document.body.innerHTML = raw;
-      } catch (_) {}
-      setTimeout(() => {
-        context._resizePreviewWindow(context.$.webView.contentWindow.document.body.clientHeight);
-      }, 2);
-    }
-    if (!this.$.webView.src) {
-      const blob = new Blob([this.$.preview.textContent], {
-        type: 'text/html'
-      });
-      this.__previewUrl = window.URL.createObjectURL(blob);
-      this.$.webView.src = this.__previewUrl;
-      this.$.webView.addEventListener('load', () => onLoad());
-    } else {
-      onLoad();
-    }
-  }
-  // Closes response preview
-  _closeResponsePreview() {
-    try {
-      this.$.webView.contentWindow.document.body.innerHTML = '';
-    } catch (_) {}
-  }
-  /**
-   * Sets height for the preview iframe
-   *
-   * @param {?Number} height
-   */
-  _resizePreviewWindow(height) {
-    if (!height) {
-      this.$.webView.style.height = 'auto';
-    } else {
-      this.$.webView.style.height = height + 'px';
     }
   }
   /**
    * Coppies current response text value to clipboard.
-   *
-   * @param {CustomEvent} e
+   * @param {Event} e
    */
   _copyToClipboard(e) {
-    const button = e.composedPath()[0];
+    const button = e.target;
     const copy = this.shadowRoot.querySelector('clipboard-copy');
     if (copy.copy()) {
-      button.icon = 'arc:done';
+      button.innerText = 'Done';
     } else {
-      button.icon = 'arc:error';
+      button.innerText = 'Error';
+    }
+    button.disabled = true;
+    if ('part' in button) {
+      button.part.add('content-action-button-disabled');
+      button.part.add('code-content-action-button-disabled');
     }
     setTimeout(() => this._resetCopyButtonState(button), 1000);
+    const ev = new CustomEvent('send-analytics', {
+      detail: {
+        type: 'event',
+        category: 'Usage',
+        action: 'Click',
+        label: 'Headers editor clipboard copy',
+      },
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(ev);
   }
 
   _resetCopyButtonState(button) {
-    button.icon = 'arc:content-copy';
+    button.innerText = 'Copy';
+    button.disabled = false;
+    if ('part' in button) {
+      button.part.remove('content-action-button-disabled');
+      button.part.remove('code-content-action-button-disabled');
+    }
   }
 
   /**
@@ -554,8 +511,10 @@ export class ResponseBodyView extends PolymerElement {
       detail: {
         destination: 'file',
         data: this._getRawContent(),
-        type: this.contentType,
-        file: 'response-data-export'
+        file: 'response-data',
+        providerOptions: {
+          contentType: this.contentType
+        }
       }
     });
     this.dispatchEvent(e);
@@ -572,8 +531,6 @@ export class ResponseBodyView extends PolymerElement {
     let ext = '.';
     if (this.isJson) {
       ext += 'json';
-    } else if (this.isXml) {
-      ext += 'xml';
     } else {
       ext += 'txt';
     }
@@ -583,21 +540,22 @@ export class ResponseBodyView extends PolymerElement {
       type: ct
     });
     const fileName = 'response-' + new Date().toISOString() + ext;
-    this._setDownloadFileUrl(URL.createObjectURL(file));
-    this._setDownloadFileName(fileName);
-    this.$.saveDialog.opened = true;
+    this._downloadFileUrl = URL.createObjectURL(file);
+    this._downloadFileName = fileName;
   }
-  // Handler for download link click to prevent default and close the dialog.
-  _downloadIconTap() {
-    setTimeout(() => {
-      this.$.saveDialog.opened = false;
-    }, 250);
+  /**
+   * Handler for download link click to prevent default and close the dialog.
+   */
+  _downloadHandler() {
+    setTimeout(() => this._downloadDialogClose(), 250);
   }
-  // Handler for file download dialog close.
+  /**
+   * Handler for file download dialog close.
+   */
   _downloadDialogClose() {
     URL.revokeObjectURL(this.downloadFileUrl);
-    this._setDownloadFileUrl(undefined);
-    this._setDownloadFileName(undefined);
+    this._downloadFileUrl = undefined;
+    this._downloadFileName = undefined;
   }
   /**
    * Toggles "view source" or raw message view.
@@ -631,14 +589,15 @@ export class ResponseBodyView extends PolymerElement {
         this.__parsedView = undefined;
         this.rawView = false;
       }
-      this.activeView = 4;
+      this.activeView = 3;
     } else {
-      this.activeView = 2;
+      this.activeView = 1;
     }
     if (this._skipJsonTableEvent) {
       return;
     }
-    if (this.hasLocalStorage) {
+    /* istanbul ignore if */
+    if (hasLocalStorage) {
       if (localStorage.jsonTableEnabled !== String(state)) {
         window.localStorage.setItem('jsonTableEnabled', state);
       }
@@ -701,34 +660,16 @@ export class ResponseBodyView extends PolymerElement {
     }
   }
 
-  closePreview() {
-    this.contentPreview = false;
+  _sourceViewHandler(e) {
+    this.rawView = e.detail.value;
   }
 
-  _computeRenderWithRaw(activeView) {
-    return activeView === 0 ? true : false;
+  _jsonTableViewHandler(e) {
+    this.jsonTableView = e.detail.value;
   }
 
-  _computeRenderShowRaw(activeView) {
-    return activeView === 0 ? false : true;
-  }
-
-  _computeRenderPreviewResponse(activeView) {
-    return activeView === 1 ? true : false;
-  }
-
-  _computeRenderToggleTable(activeView) {
-    return activeView === 4 || activeView === 2 ? true : false;
-  }
-  /**
-   * Computes boolean value whether to render the JSON table element.
-   *
-   * @param {Boolean} isJson
-   * @param {Boolean} jsonTableView
-   * @return {Boolean}
-   */
-  _computeRenderJsonTable(isJson, jsonTableView) {
-    return !!(isJson && jsonTableView);
+  _rawTextWrapViewHandler(e) {
+    this.rawTextWrap = e.detail.value;
   }
   /**
    * Fired when the element request to export data outside the application.
@@ -740,8 +681,10 @@ export class ResponseBodyView extends PolymerElement {
    *
    * @event export-data
    * @param {String} data A text to save in the file.
-   * @param {String} type Data content type
+   * @param {String} destination Always 'file'
    * @param {String} file Suggested file name
+   * @param {Object} providerOptions File provider options.
+   * Contains `contentType` property.
    */
   /**
    * Fired when the `jsonTableView` property change to inform other

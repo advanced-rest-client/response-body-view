@@ -2,20 +2,15 @@
 
 [![Build Status](https://travis-ci.org/advanced-rest-client/response-body-view.svg?branch=stage)](https://travis-ci.org/advanced-rest-client/response-body-view)
 
-[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/advanced-rest-client/response-body-view)
-
 ## &lt;response-body-view&gt;
 
-An element to display a HTTP response body.
-
+An element to display a HTTP response body in accessible and human readable form.
 
 ```html
-<response-body-view response-text="# Hello world" content-type="application/markdown"></response-body-view>
+<response-body-view responsetext="# Hello world" contenttype="application/markdown"></response-body-view>
 ```
 
-### API components
-
-This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
+Note, the element internally uses `TextDecoder` class for responses that are an `ArrayBuffer` instead of text. If the response can be an `ArrayBuffer` you need to ensure the `TextDecoder` class is supported / polyfilled.
 
 ## Usage
 
@@ -35,43 +30,72 @@ npm install --save @advanced-rest-client/response-body-view
   </head>
   <body>
     <response-body-view></response-body-view>
+    <script>
+    {
+      const view = document.querySelector('response-body-view');
+      view.responseText = JSON.stringify({
+        data: 'some data'
+      });
+      view.contentType = 'application/json'
+    }
+    </script>
   </body>
 </html>
 ```
 
-### In a Polymer 3 element
+### In a LitElement
 
 ```js
-import {PolymerElement, html} from '@polymer/polymer';
+import { LitElement, html } from 'lit-element';
 import '@advanced-rest-client/response-body-view/response-body-view.js';
 
 class SampleElement extends PolymerElement {
-  static get template() {
+  render() {
     return html`
-    <response-body-view></response-body-view>
+    <response-body-view
+      responsetext="# Hello world"
+      contenttype="application/markdown"
+      @url-change-action="${this._urlClickHandler}"
+      @request-workspace-append="${this._urlMetaClickHandler}"></response-body-view>
     `;
+  }
+
+  _urlClickHandler(e) {
+    console.log(`User clicked on ${e.detail.value}`);
+  }
+
+  _urlMetaClickHandler(e) {
+    console.log(`User clicked on ${e.detail.value} with ctrl or meta`);
   }
 }
 customElements.define('sample-element', SampleElement);
 ```
 
-### Installation
+## Development
 
 ```sh
 git clone https://github.com/advanced-rest-client/response-body-view
-cd api-url-editor
+cd response-body-view
 npm install
-npm install -g polymer-cli
 ```
 
 ### Running the demo locally
 
 ```sh
-polymer serve --npm
-open http://127.0.0.1:<port>/demo/
+npm start
 ```
 
 ### Running the tests
 ```sh
-polymer test --npm
+npm test
 ```
+
+### API components
+
+This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
+
+## Breaking Changes in v3
+
+-   XML custom view has been replaced with Prism syntax highlighting
+-   Prism parsing timeout is no longer supported, it wasn't working well anyway
+-   Response preview has been removed, it couldn't reliably render response view
