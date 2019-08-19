@@ -428,3 +428,7 @@
 
 
 
+# [3.0.0](https://github.com/advanced-rest-client/response-body-view/compare/0.1.22...3.0.0) (2019-08-19)
+
+
+
