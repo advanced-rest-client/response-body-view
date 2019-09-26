@@ -82,6 +82,7 @@ export class ResponseBodyView extends LitElement {
       display: flex;
       flex-direction: row;
       align-items: center;
+      margin-bottom: 8px;
     }
 
     .download-link {
@@ -120,6 +121,7 @@ export class ResponseBodyView extends LitElement {
 
   _downloadTemplate() {
     const {
+      compatibility,
       _downloadFileUrl,
       _downloadFileName
     } = this;
@@ -129,14 +131,21 @@ export class ResponseBodyView extends LitElement {
         <p>Your file is now ready to download.</p>
       </div>
       <div>
-        <anypoint-button emphasis="low" @click="${this._downloadDialogClose}">Cancel</anypoint-button>
+        <anypoint-button
+          emphasis="low"
+          @click="${this._downloadDialogClose}"
+          ?compatibility="${compatibility}"
+        >Cancel</anypoint-button>
         <a
           href="${_downloadFileUrl}"
           download="${_downloadFileName}"
           @click="${this._downloadHandler}"
           target="_blank"
           class="download-link">
-          <anypoint-button emphasis="high">Download file</anypoint-button>
+          <anypoint-button
+            emphasis="high"
+            ?compatibility="${compatibility}"
+          >Download file</anypoint-button>
         </a>
       </div>
     </div>`;
@@ -149,6 +158,7 @@ export class ResponseBodyView extends LitElement {
       activeView,
       jsonTableView,
       rawTextWrap,
+      compatibility,
       _downloadFileUrl,
       _raw,
       _isJson
@@ -161,6 +171,7 @@ export class ResponseBodyView extends LitElement {
         class="action-button"
         data-action="copy"
         emphasis="medium"
+        ?compatibility="${compatibility}"
         @click="${this._copyToClipboard}"
         aria-label="Press to copy response to clipboard"
         title="Copy response to clipboard">Copy</anypoint-button>
@@ -169,6 +180,7 @@ export class ResponseBodyView extends LitElement {
         class="action-button"
         data-action="save-file"
         emphasis="medium"
+        ?compatibility="${compatibility}"
         @click="${this._saveFile}"
         aria-label="Press to save content to file"
         title="Save content to file">Save</anypoint-button>
@@ -177,6 +189,7 @@ export class ResponseBodyView extends LitElement {
         class="action-button"
         data-action="raw-toggle"
         emphasis="medium"
+        ?compatibility="${compatibility}"
         toggles
         .active="${rawView}"
         @active-changed="${this._sourceViewHandler}"
@@ -187,6 +200,7 @@ export class ResponseBodyView extends LitElement {
         part="content-action-button, code-content-action-button"
         class="action-button"
         data-action="json-table"
+        ?compatibility="${compatibility}"
         toggles
         .active="${jsonTableView}"
         @active-changed="${this._jsonTableViewHandler}"
@@ -197,6 +211,7 @@ export class ResponseBodyView extends LitElement {
         part="content-action-button, code-content-action-button"
         class="action-button"
         data-action="text-wrap"
+        ?compatibility="${compatibility}"
         toggles
         .active="${rawTextWrap}"
         @active-changed="${this._rawTextWrapViewHandler}"
