@@ -6,13 +6,13 @@ import {
   html
 } from '@open-wc/testing';
 import * as MockInteractions from '@polymer/iron-test-helpers/mock-interactions.js';
-import sinon from 'sinon/pkg/sinon-esm.js';
+import * as sinon from 'sinon/pkg/sinon-esm.js';
 import '../response-body-view.js';
 
 describe('<response-body-view>', function() {
   function str2ab(str) {
     const buf = new ArrayBuffer(str.length * 2);
-    const bufView = new Uint16Array(buf);
+    const bufView = new Uint8Array(buf);
     for (let i = 0, strLen = str.length; i < strLen; i++) {
       bufView[i] = str.charCodeAt(i);
     }
@@ -593,6 +593,7 @@ describe('<response-body-view>', function() {
     it('clears download dialog when response changes', async () => {
       element.saveToFile();
       await nextFrame();
+      /* eslint-disable require-atomic-updates */
       element.responseText = 'test';
       element.contentType = 'text/plain';
       await nextFrame();
