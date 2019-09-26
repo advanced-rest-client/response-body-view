@@ -113,7 +113,7 @@ export class ResponseBodyView extends LitElement {
         .responseText="${content}"
         .contentType="${this.contentType}"></response-highlighter>`;
       case 2: return html`<json-viewer .json="${content}"></json-viewer>`;
-      case 3: return html`<json-table .json="${content}"></json-table>`;
+      case 3: return html`<json-table .json="${content}" ?compatibility="${this.compatibility}"></json-table>`;
       default:
     }
   }
@@ -264,7 +264,11 @@ export class ResponseBodyView extends LitElement {
       /**
        * If set it opens the JSON table view.
        */
-      jsonTableView: { type: Boolean }
+      jsonTableView: { type: Boolean },
+      /**
+       * Enables Anypoint compatibility
+       */
+      compatibility: { type: Boolean },
     };
   }
 
