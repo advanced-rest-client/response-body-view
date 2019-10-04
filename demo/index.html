@@ -54,9 +54,7 @@
       if (!value) {
         return;
       }
-      url = location.protocol + '//' + location.host +
-        location.pathname.substr(0, location.pathname.lastIndexOf('/')) +
-        '/' + value;
+      url = new URL(value, location.href).toString();
       download();
     }
 
@@ -74,6 +72,11 @@
             <option value="invalid.json">Test case - invalid json</option>
             <option value="test.html">Test case - html</option>
             <option value="large.html">Test case - large payload</option>
+            <option value="https://httpbin.org/image/jpeg">JPEG</option>
+            <option value="https://httpbin.org/image/png">PNG</option>
+            <option value="https://httpbin.org/image/svg">SVG</option>
+            <option value="https://httpbin.org/image/webp">WEBP</option>
+            <option value="test-pdf.pdf">PDF</option>
           </select>
         </div>
 

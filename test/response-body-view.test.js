@@ -525,7 +525,7 @@ describe('<response-body-view>', function() {
       const { detail } = spy.args[0][0];
       assert.equal(detail.destination, 'file', 'destination is set');
       assert.equal(detail.data, '{"test":true}', 'data is set');
-      assert.equal(detail.file, 'response-data', 'file is set');
+      assert.include(detail.file, 'response-', 'file is set');
       assert.deepEqual(detail.providerOptions, {
         contentType: 'application/json'
       }, 'providerOptions is set');
@@ -549,7 +549,7 @@ describe('<response-body-view>', function() {
     });
 
     it('sets web download properties', () => {
-      element.saveToFile();
+      element.saveToFile('test', 'test');
       assert.typeOf(element._downloadFileUrl, 'string', '_downloadFileUrl is set');
       assert.typeOf(element._downloadFileName, 'string', '_downloadFileName is set');
     });
@@ -641,6 +641,171 @@ describe('<response-body-view>', function() {
       element.saveToFile();
       await nextFrame();
       await assert.isAccessible(element);
+    });
+  });
+
+  describe('_prepareImageDataUrl()', () => {
+    let element;
+    let buffer;
+    beforeEach(async () => {
+      element = await basicFixture();
+      buffer = str2ab('lorem ipsum');
+    });
+
+    it('produces data url string', () => {
+      const result = element._prepareImageDataUrl('image/jpeg', buffer);
+      assert.equal(result, 'data:image/jpeg;base64, bG9yZW0gaXBzdW0AAAAAAAAAAAAAAA==');
+    });
+
+    it('accepts ARCs node buffer', () => {
+      const b = {
+        type: 'Buffer',
+        data: buffer
+      }
+      const result = element._prepareImageDataUrl('image/jpeg', b);
+      assert.equal(result, 'data:image/jpeg;base64, bG9yZW0gaXBzdW0AAAAAAAAAAAAAAA==');
+    });
+  });
+
+  describe('_fileExtension()', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+    });
+
+    it('returns "json" when _isJson flag is set', () => {
+      element._isJson = true;
+      const result = element._fileExtension();
+      assert.equal(result, 'json');
+    });
+
+    it('returns "txt" when no content type', () => {
+      const result = element._fileExtension();
+      assert.equal(result, 'txt');
+    });
+
+    it('returns "txt" when incorrect content type', () => {
+      element.contentType = 'test';
+      const result = element._fileExtension();
+      assert.equal(result, 'txt');
+    });
+
+    it('returns media type', () => {
+      element.contentType = 'application/x-test';
+      const result = element._fileExtension();
+      assert.equal(result, 'x-test');
+    });
+
+    it('clears charset part', () => {
+      element.contentType = 'application/x-test; charset=utf8';
+      const result = element._fileExtension();
+      assert.equal(result, 'x-test');
+    });
+
+    it('clears "+" part', () => {
+      element.contentType = 'image/svg+xml; charset=utf8';
+      const result = element._fileExtension();
+      assert.equal(result, 'svg');
+    });
+  });
+
+  describe('_exportContent()', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+      element._raw = str2ab('lorem ipsum');
+    });
+
+    it('returns _raw value when is image', () => {
+      element._isImage = true;
+      const result = element._exportContent();
+      assert.equal(result, element._raw);
+    });
+
+    it('returns _raw value when is pdf', () => {
+      element._isPdf = true;
+      const result = element._exportContent();
+      assert.equal(result, element._raw);
+    });
+
+    it('returns data from ARCs Buffer', () => {
+      const data = element._raw;
+      element._raw = {
+        type: 'Buffer',
+        data: data
+      }
+      element._isPdf = true;
+      const result = element._exportContent();
+      assert.equal(result, data);
+    });
+
+    it('returns text value otherwise', () => {
+      const result = element._exportContent();
+      assert.include(result, 'lorem ipsum');
+    });
+  });
+
+  describe('image response', () => {
+    let buffer;
+    before(async () => {
+      const response = await fetch('/base/test/img.png');
+      if (!response.ok) {
+        throw new Error('Unable to load test image');
+      }
+      buffer = await response.arrayBuffer();
+    });
+
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+      element.responseText = buffer;
+      element.contentType = 'image/png';
+      await aTimeout(1);
+    });
+
+    it('sets _isImage flag', () => {
+      assert.isTrue(element._isImage);
+    });
+
+    it('sets activeView', () => {
+      assert.equal(element.activeView, 4);
+    });
+
+    it('renders response image', () => {
+      const node = element.shadowRoot.querySelector('img.img-preview')
+      assert.ok(node);
+    });
+  });
+
+  describe('PDF response', () => {
+    let buffer;
+    before(async () => {
+      const response = await fetch('/base/demo/test-pdf.pdf');
+      if (!response.ok) {
+        throw new Error('Unable to load test PDF');
+      }
+      buffer = await response.arrayBuffer();
+    });
+
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+      element.responseText = buffer;
+      element.contentType = 'application/pdf';
+      await aTimeout(1);
+    });
+
+    it('sets _isImage flag', () => {
+      assert.isTrue(element._isPdf);
+    });
+
+    it('sets activeView', () => {
+      assert.equal(element.activeView, 5);
+    });
+
+    it('renders response image', () => {
+      const node = element.shadowRoot.querySelector('p.content-info')
+      assert.ok(node);
     });
   });
 });

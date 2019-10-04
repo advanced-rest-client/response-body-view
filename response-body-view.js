@@ -102,6 +102,15 @@ export class ResponseBodyView extends LitElement {
       font-size: 1.5rem;
       font-weight: 400;
       letter-spacing: 0.01rem;
+    }
+
+    .img-preview {
+      max-width: 100%;
+    }
+
+    .content-info {
+      text-align: center;
+      margin: 24px 0;
     }`;
   }
 
@@ -115,6 +124,8 @@ export class ResponseBodyView extends LitElement {
         .contentType="${this.contentType}"></response-highlighter>`;
       case 2: return html`<json-viewer .json="${content}"></json-viewer>`;
       case 3: return html`<json-table .json="${content}" ?compatibility="${this.compatibility}"></json-table>`;
+      case 4: return this._imageTemplate();
+      case 5: return this._pdfTemplate();
       default:
     }
   }
@@ -149,6 +160,17 @@ export class ResponseBodyView extends LitElement {
         </a>
       </div>
     </div>`;
+  }
+
+  _imageTemplate() {
+    return html`<img class="img-preview" src="${this._imageDataUrl}" alt="">`;
+  }
+
+  _pdfTemplate() {
+    return html`<p class="content-info">
+      The response conatin <b>PDF</b> data.<br/>
+      Save the file to preview its contents.
+    </p>`;
   }
 
   render() {
@@ -228,8 +250,9 @@ export class ResponseBodyView extends LitElement {
     return {
       /**
        * Raw response as a response text.
+       * @type {String|ArrayBuffer|Buffer|Object}
        */
-      responseText: { type: String },
+      responseText: { },
       /**
        * A variable to be set after the `responseText` change
        */
@@ -284,6 +307,7 @@ export class ResponseBodyView extends LitElement {
        * Enables Anypoint compatibility
        */
       compatibility: { type: Boolean },
+      _imageDataUrl: { type: String }
     };
   }
 
@@ -421,10 +445,25 @@ export class ResponseBodyView extends LitElement {
   _contentTypeChanged(contentType) {
     let parsed = false;
     let json = false;
+    let imageDataUrl = undefined;
+    let isImage = false;
+    let isPdf = false;
     if (contentType) {
       if (contentType.indexOf('json') !== -1) {
         this.activeView = 2;
         json = true;
+      } else if (contentType.indexOf('image/') === 0) {
+        imageDataUrl = this._prepareImageDataUrl(contentType, this._raw);
+        if (imageDataUrl) {
+          this.activeView = 4;
+          isImage = true;
+        } else {
+          this.activeView = 1;
+          parsed = true;
+        }
+      } else if (contentType === 'application/pdf') {
+        isPdf = true;
+        this.activeView = 5;
       } else {
         this.activeView = 1;
         parsed = true;
@@ -432,10 +471,33 @@ export class ResponseBodyView extends LitElement {
     }
     this._isJson = json;
     this._isParsed = parsed;
+    this._imageDataUrl = imageDataUrl;
+    this._isImage = isImage;
+    this._isPdf = isPdf;
     if (json) {
       this._ensureJsonTable();
     }
   }
+  /**
+   * Converts current `_raw` data to an image data URL string.
+   * @param {String} contentType Response content type
+   * @param {Buffer|ArrayBuffer} raw
+   * @return {String|undefined} Procerssed image data or undefined when error.
+   */
+  _prepareImageDataUrl(contentType, raw) {
+    if (raw && raw.type === 'Buffer') {
+      raw = raw.data;
+    }
+    try {
+      const arr = new Uint8Array(raw);
+      const str = arr.reduce((data, byte) => data + String.fromCharCode(byte), '');
+      const enc = btoa(str);
+      return `data:${contentType};base64, ${enc}`;
+    } catch (_) {
+      // ..
+    }
+  }
+
   /**
    * When response's content type is JSON the view renders the
    * JSON table element. This function reads current state for the table
@@ -517,20 +579,23 @@ export class ResponseBodyView extends LitElement {
       button.part.remove('code-content-action-button-disabled');
     }
   }
-
   /**
    * Fires the `export-data` custom event. If the event is not canceled
    * then it will use default web implementation for file saving.
    */
   _saveFile() {
+    const ext = this._fileExtension();
+    const now = new Date().toISOString();
+    const file = `response-${now}.${ext}`;
+    const data = this._exportContent();
     const e = new CustomEvent('export-data', {
       bubbles: true,
       composed: true,
       cancelable: true,
       detail: {
         destination: 'file',
-        data: this._getRawContent(),
-        file: 'response-data',
+        data,
+        file,
         providerOptions: {
           contentType: this.contentType
         }
@@ -540,27 +605,64 @@ export class ResponseBodyView extends LitElement {
     if (e.defaultPrevented) {
       return;
     }
-    this.saveToFile();
+    this.saveToFile(data, file);
   }
   /**
    * Creates a file object form current response text and opens a dialog
    * with the link to a file.
+   *
+   * @param {String|ArrayBuffer} data
+   * @param {String} fileName
    */
-  saveToFile() {
-    let ext = '.';
-    if (this.isJson) {
-      ext += 'json';
-    } else {
-      ext += 'txt';
-    }
+  saveToFile(data, fileName) {
     const ct = this.contentType || 'text/plain';
-    const raw = this._getRawContent();
-    const file = new Blob([raw], {
+    if (typeof data !== 'string') {
+      data = new Uint8Array(data);
+    }
+    const file = new Blob([data], {
       type: ct
     });
-    const fileName = 'response-' + new Date().toISOString() + ext;
     this._downloadFileUrl = URL.createObjectURL(file);
     this._downloadFileName = fileName;
+  }
+  /**
+   * Creates file extension name based on current content type.
+   * @return {String} A file extension. `txt` as default
+   */
+  _fileExtension() {
+    if (this._isJson) {
+      return 'json';
+    }
+    const { contentType } = this;
+    if (!contentType) {
+      return 'txt';
+    }
+    let mime = contentType.split('/')[1];
+    if (!mime) {
+      return 'txt';
+    }
+    const charsetIndex = mime.indexOf(';');
+    if (charsetIndex !== -1) {
+      mime = mime.substr(0, charsetIndex);
+    }
+    const plusIndex = mime.indexOf('+');
+    if (plusIndex !== -1) {
+      mime = mime.substr(0, plusIndex);
+    }
+    return mime;
+  }
+  /**
+   * @return {String|ArrayBuffer|Buffer} content pre-processed for export.
+   */
+  _exportContent() {
+    if (this._isImage || this._isPdf) {
+      let raw = this._raw;
+      if (raw && raw.type === 'Buffer') {
+        raw = raw.data;
+      }
+      return raw;
+    }
+    return this._getRawContent();
   }
   /**
    * Handler for download link click to prevent default and close the dialog.
