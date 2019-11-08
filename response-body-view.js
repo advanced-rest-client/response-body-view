@@ -81,10 +81,16 @@ export class ResponseBodyView extends LitElement {
     .content-actions {
       display: flex;
       flex-direction: row;
+      flex-wrap: wrap;
       align-items: center;
       margin-bottom: 8px;
     }
 
+    .action-button {
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+    
     .download-link {
       text-decoration: none;
       color: inherit;
