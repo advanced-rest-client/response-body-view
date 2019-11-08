@@ -87,7 +87,7 @@ export class ResponseBodyView extends LitElement {
     }
 
     .action-button {
-      margin-top: 5px;
+      margin-top: 4px;
       white-space: nowrap;
     }
     
