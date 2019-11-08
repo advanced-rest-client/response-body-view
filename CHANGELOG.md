@@ -497,3 +497,19 @@
 
 
 
+## [3.0.6](https://github.com/advanced-rest-client/response-body-view/compare/0.1.22...3.0.6) (2019-11-08)
+
+
+### Bug Fixes
+
+* fixing audit errors ([c54c5da](https://github.com/advanced-rest-client/response-body-view/commit/c54c5da03d17d38f874d97ecdf76ebc108dfb177))
+* fixing restoration of the body from buffer view ([f252103](https://github.com/advanced-rest-client/response-body-view/commit/f252103d7f7aae87db70e9dd5d5f89e9517145af))
+
+
+### Features
+
+* adding compatibility property ([8db005b](https://github.com/advanced-rest-client/response-body-view/commit/8db005bc5dbec3f955aae93541752e109eabe6f6))
+* adding support for images and PDFs ([2afb10f](https://github.com/advanced-rest-client/response-body-view/commit/2afb10f3c694d14c0591e7b507211dadc2f2b8b1))
+
+
+
