@@ -58,7 +58,7 @@ if (typeof chrome !== 'undefined' && chrome.i18n) {
  * @memberof UiElements
  */
 export class ResponseBodyView extends LitElement {
-  static get styles() {
+  get styles() {
     return css`:host {
       display: block;
       position: relative;
@@ -192,7 +192,7 @@ export class ResponseBodyView extends LitElement {
       _isJson
     } = this;
     const content = _raw && this._getRawContent(_raw);
-    return html `
+    return html `<style>${this.styles}</style>
     ${contentType && content ? html`<div class="content-actions">
       <anypoint-button
         part="content-action-button, code-content-action-button"
