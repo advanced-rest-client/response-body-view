@@ -1,3 +1,10 @@
+***
+
+## This component is deprecated
+
+Use `@advanced-rest-client/arc-response` instead.
+***
+
 [![Published on NPM](https://img.shields.io/npm/v/@advanced-rest-client/response-body-view.svg)](https://www.npmjs.com/package/@advanced-rest-client/response-body-view)
 
 [![Build Status](https://travis-ci.org/advanced-rest-client/response-body-view.svg?branch=stage)](https://travis-ci.org/advanced-rest-client/response-body-view)
