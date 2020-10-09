@@ -174,7 +174,7 @@ export class ResponseBodyView extends LitElement {
 
   _pdfTemplate() {
     return html`<p class="content-info">
-      The response conatin <b>PDF</b> data.<br/>
+      The response contains <b>PDF</b> data.<br/>
       Save the file to preview its contents.
     </p>`;
   }
